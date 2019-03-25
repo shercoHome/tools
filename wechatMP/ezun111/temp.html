@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_parent">
+
+
+    <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #clearfix {
+            overflow: hidden;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        #clearfix {
+            height: 100%;
+        }
+
+        #clearfix iframe {
+            height: 100%;
+            width: 100%;
+        }
+
+        #clearfix.ios {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch !important;
+            height: 100%;
+        }
+
+        #clearfix.ios iframe {
+            height: 100%;
+            min-width: 100%;
+            width: 100px;
+            *width: 100%;
+        }
+    </style>
+
+    <title>E尊国际</title>
+
+</head>
+
+<body>
+    <script type="text/javascript">
+        function malimalihong(url) {
+            if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
+                document.getElementById("clearfix").setAttribute("class", "ios");
+                var scrolling = 'no';
+            } else {
+                var scrolling = 'yes';
+            }
+            var str = '<iframe src="' + url + '" id="url"  scrolling="' + scrolling + '" frameborder="0" ></iframe>';
+            document.getElementById("clearfix").innerHTML += str;
+        }
+
+
+        function click(e) {
+            if (document.all) {
+                if (event.button == 2 || event.button == 3) {
+                    alert("有任何疑问请咨询客服");
+                    //oncontextmenu='return false';
+                }
+            }
+            if (document.layers) {
+                if (e.which == 3) {
+                    //oncontextmenu='return false';
+                }
+            }
+        }
+
+
+        if (document.layers) {
+            document.captureEvents(Event.MOUSEDOWN);
+        }
+        document.onmousedown = click;
+        //document.oncontextmenu = new Function("return false;")
+        document.onkeydown = document.onkeyup = document.onkeypress = function () {
+            if (window.event.keyCode == 123) {
+                window.event.returnValue = false;
+                return (false);
+            }
+        }
+
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+            } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+            }
+        } else {
+            onBridgeReady();
+        }
+        // 当微信内置浏览器完成内部初始化后会触发WeixinJSBridgeReady事件。
+        function onBridgeReady() {
+            // 通过下面这个API隐藏右上角按钮
+             WeixinJSBridge.call('hideOptionMenu');
+            // 发送给好友
+            // WeixinJSBridge.on('menu:share:appmessage', function (argv) {
+            //     WeixinJSBridge.invoke('sendAppMessage', {
+            //         "appid": "",
+            //         "img_url": 'http://wechat.ksyi.cn/favicon.ico',
+            //         "img_width": "100",
+            //         "img_height": "100",
+            //         "link": "http://t.cn/E5Bohnn",
+            //         "desc": "Duke说存100送100！E尊国际提供真人、老虎机、彩票、棋牌、体育多种类型游戏，“赢在品牌，赢在E尊”，ezun85.com。！",
+            //         "title": 'E尊国际'
+            //     }, function (res) {
+            //         //_report('send_msg', res.err_msg); // 这是回调函数，必须注释掉
+            //     })
+            // });
+        }
+
+
+
+
+
+
+    </script>
+    <div id="clearfix">
+    </div>
+    <script>
+
+        let ifram = document.getElementById('ifram');
+        if (navigator.userAgent.match(/iPad|iPhone/i)) {
+            let iframe_box = document.getElementById('iframe-box');
+            iframe_box.style.width = 100 + '%';
+            iframe_box.style.overflowX = 'hidden';
+            iframe_box.style.overflowY = 'scroll';
+            iframe_box.style.webkitOverflowScrolling = 'touch';
+            ifram.setAttribute('scrolling', 'no');
+            iframe_box.appendChild(ifram)
+        }
+
+
+    </script>　
+
+
+    <script>
+        var result2 = "http://m.ezun111.com"; malimalihong(result2);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+authorize|0|
+shareRequired|100|
+authorizeWhite|name1#name2|
+authorizeBlack|name1#name2|
+planId|2|

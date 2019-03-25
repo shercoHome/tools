@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>spider</title>
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+  domain:
+<input id="domain" value="http://www.dawanghui.com">
+<br>
+mk:
+<input id="mk" value="/pinpai/">
+<br>
+index:
+<input id="i" value="1">to<input  id="j" value="1">
+
+<br>
+<br>
+<button id="start">start</button>
+<button id="clear">clear</button>
+<br>
+
+<div id="re"></div>
+  <script>
+    var max;
+    $(document).ready(function(){
+
+$("#start").click(function(){
+
+  var domain=document.getElementById("domain").value;
+
+  domain=encodeURIComponent(domain);
+
+  var mk=document.getElementById("mk").value;
+
+  var i=Number(document.getElementById("i").value);
+  var j=Number(document.getElementById("j").value);
+  console.log(i+"----"+j);
+var t;
+if(i>j){
+  console.log(i+"-////---"+j);
+  t=i;
+  i=j;
+  j=t;
+  console.log(i+"-***---"+j);
+}
+console.log(i);
+max=j;
+
+  go(domain,mk,i)
+
+});
+   
+
+});
+
+function go(d,l,n){
+
+  var url="/spiderForSearchLink.php?"+"n="+n+"&d="+d+"&l="+l;
+if(n==1){
+  url="/spiderForSearchLink.php?"+"d="+d+"&l="+l;
+}
+
+  $.get(url, function(result){
+    $("#re").append(result);
+    if(n<max){
+      go(d,l,Number(n)+1);
+    }
+    
+  });
+}
+
+document.getElementById("clear").onclick=function(){
+  alert("div  clear");
+  document.getElementById("re").innerHTML="";
+}
+  </script>
+</body>
+</html>

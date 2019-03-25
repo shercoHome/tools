@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>转向银行卡</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" crossorigin="anonymous"></script>
+    <style>
+        body,html{
+            margin: 0;padding: 0;
+        }
+
+                input,.add,.btn{
+                    border: #bbbbbb 1px solid;
+                    border-radius: 4px;
+                    padding: 4px 2px;
+                    display: block;
+                    float: left;
+                    font-size: 14px;
+                    height: 20px;
+                    line-height: 20px;
+                    width: 150px; /* 宽度 */
+                    box-sizing: content-box;
+                    margin-top: 8px;
+                }
+                #hy{
+                    text-align: center;
+               
+                }
+                #je{
+                    border-right: none;
+                    padding-right: 0;
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 0;
+                    width:100px; /* 宽度 */
+                    text-align: right;
+                }
+                .add{
+                    width:50px; /* 宽度 */
+                    border-left: none;
+                    padding-left: 0;
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
+                    font-size: 12px;
+                }
+                .btn {
+                      text-align: center;
+                     
+                        border-width: 0px; 
+                        background: #1e90ff; 
+                        cursor: pointer; 
+                        outline: none;
+                        font-family: "Microsoft YaHei";
+                        color: white; 
+                      }
+                      table{
+                          width: 240px;
+                          margin: 100px auto;
+                      }
+                      .td1{
+                          width:90px;
+                      }
+                      .td2{
+                          width:150px;
+                      }
+                      .tdtips{
+                          font-size: 10px;
+                          color: #333;
+                          padding: 8px 0;
+                      }
+                      #msg{
+                        font-size: 12px;
+                          color: #333;
+                          padding: 8px 0;
+                      }
+                      .myDiv{
+                        font-size: 12px;
+                        
+                        color: #333;
+                          padding: 20px 0;
+                      }
+                      .disable{
+                          background: #ddd;
+                          color:#1e90ff;
+                      }
+                      </style>
+</head>
+
+<body>
+
+    <table>
+        <tr>
+            <td class="ar td1">E尊账号 :</td>
+            <td class="ar td2"><input id="hy" type="text" value="" class="ac" /></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td id="msg1" class="tdtips">* 不要写错账号哦</td>
+        </tr>
+        <tr>
+            <td class="ar">存款金额:</td>
+            <td><input id="je" type="text" value="" class="ar" /><input id="r" type="text" value=".00元" class="ar add" /></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td id="msg2" class="tdtips">* 金额自动带小数，到账更快</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><span class="btn disable" id="goSubmit">加载中</span>
+        </tr>
+        <tr>
+            <td></td>
+            <td id="msg"></td>
+        </tr>
+    </table>
+    <script>
+        var search_ = location.search; 
+        if(search_.indexOf("?") != -1) {
+            search_ = search_.substr(1);
+        }
+
+        var r = String(Math.random() * 99).split(".")[0];
+        if (r == 0) {
+            r = String(Math.random() * 99).split(".")[0];
+        }
+        r = (r < 10) ? ("0" + "" + r) : r;
+        document.getElementById("r").value = "." + r + "元";
+
+        var bankName = "接口出错";
+        var bankMark = "AAAA";
+        var bankAccount = "请联系E尊客服";
+        var cardNo = "*******";
+        var cardIndex = "88888888888888888";
+        var cardNoHidden = "0";
+        var cardType = "";
+        var ele_hy = document.getElementById("hy");
+        var ele_je = document.getElementById("je");
+        var ele_msg = document.getElementById("msg");
+        var isLoading = true;
+        $(document).ready(function () {
+
+            $("#hy").bind('input porpertychange', function () {
+                $("#msg1").html("* 正在输入（字母/数字）");
+            });
+            $("#hy").blur(function () {
+                var account = ele_hy.value;//E尊会员账号
+                account = account.replace(/\s+/g, "");
+                var yaa = /^[a-zA-Z0-9]{4,12}$/;
+                if (!yaa.test(account)) {
+                    $("#msg1").html("* 会员账号错误");
+                } else {
+                    $("#msg1").html("* 请确保账号正确哦");
+                }
+            });
+            $("#je").bind('input porpertychange', function () {
+                var amountStr = ele_je.value;//存款金额
+                var amount = parseInt(amountStr);
+                if (amount != amountStr) {
+                    $("#msg2").html("* 请输入整数的金额");
+                    return;
+                } else if (amount < 10) {
+                    $("#msg2").html("* 最低存款10元");
+                    return;
+                } else {
+                    $("#msg2").html("* 金额自动带小数，到账更快");
+                }
+            });
+
+            $.post("Get.php", { type: "getCard", name: "alipay_to_bank_card_info", data: "d=null",test:search_ }, function (data, status) {
+                console.log("Data: " + data + "\nStatus: " + status);
+                if (status == "success") {
+                    if (data == "-1" || data == "-2" || data == "-3" || data == "-4" || data == "-5" || data.indexOf("|") == -1) {
+                        err("此入款渠道暂时维护(" + data + ")，请联系E尊客服");
+                    } else {
+                        var arr = data.split("|");
+                        cardType = arr[0];
+                        bankName = arr[1];
+                        bankMark = arr[2];
+                        bankAccount = arr[3];
+                        cardNo = arr[4];
+                        cardIndex = arr[5];
+                        cardNoHidden = arr[6];
+                        finishing("填写完毕，去存款");
+                    }
+                } else {
+                    err("服务器连接失败 Status: " + status);
+                }
+            });
+
+            $("#goSubmit").click(function () {
+                if (isLoading) {
+                    return
+                }
+                loading("正在提交中");
+
+                var account = ele_hy.value;//E尊会员账号
+                account = account.replace(/\s+/g, "");
+                var yaa = /^[a-zA-Z0-9]{4,12}$/;
+                if (!yaa.test(account)) {
+                    msg("* 请输入正确的账号（字母/数字）");
+                    ele_hy.value = "";
+                    finishing("填写完毕，去存款");
+                    return;
+                }
+
+                var amountStr = ele_je.value;//存款金额
+                var amount = parseInt(amountStr);
+                if (amount != amountStr) {
+                    msg("* 请输入整数的金额");
+                    ele_je.value = "";
+                    finishing("填写完毕，去存款");
+                    return;
+                } else if (amount < 10) {
+                    msg("* 最低存款10元");
+                    ele_je.value = "";
+                    finishing("填写完毕，去存款");
+                    return;
+                }
+                amount = Number(amount) + Number(r / 100);
+
+                var alipay_url = "https://www.alipay.com/?appId=09999988&actionType=toCard&sourceId=bill&cardNo=" + cardNo + "&bankAccount=" + bankAccount + "&money=" + amount + "&amount=" + amount + "&bankMark=" + bankMark + "&bankName=" + bankName + "&cardIndex=" + cardIndex + "&cardNoHidden=" + cardNoHidden + "&cardChannel=HISTORY_CARD&orderSource=from";
+                console.log(alipay_url);
+                $.post("Get.php", { type: "submit", name: "alipay_to_bank_submit_form",test:search_, data: "n=" + account + "&a=" + amount + "&t=" + cardType }, function (data, status) {
+                    console.log("Data: " + data + "\nStatus: " + status);
+                    if (status == "success") {
+                        if (data == "ok") {
+                            msg("提交表格成功");
+                            window.location.href = alipay_url;
+                            loading("正在前往转账");
+                        } else if (data == "err") {
+                            msg("提交失败，请检查账号");
+                            finishing("填写完毕，去存款");
+                        } else {
+                            msg("提交表格失败 " + data);
+                            finishing("填写完毕，去存款");
+                        }
+                    } else {
+                        err("服务器连接失败 Status: " + status);
+                        finishing("填写完毕，去存款");
+                    }
+
+                });
+            });
+        });
+        function msg(m) {
+            ele_msg.innerHTML = m;
+        };
+        function err(m) {
+            document.write(m);
+        };
+        function loading(t) {
+            $("#goSubmit").text(t).addClass("disable");
+            isLoading = true;
+        }
+        function finishing(t) {
+            $("#goSubmit").text(t).removeClass("disable");
+            isLoading = false;
+        }
+    </script>
+</body>
+
+</html>

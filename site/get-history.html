@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>get-history</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+        crossorigin="anonymous"></script>
+        <style>body{
+            text-align: center;
+        }
+        textarea{
+            height:100px;
+            width: 100%;
+        }
+        	table {
+		/* width: 100%; */
+        margin: 0 auto;
+		font-family: verdana, arial, sans-serif;
+		font-size: 11px;
+		color: #333333;
+		border-width: 1px;
+		border-color: #666666;
+		border-collapse: collapse;
+	}
+	
+	table th {
+		text-align: center;
+		color: #FFF;
+		border-width: 1px;
+		padding: 5px;
+		border-style: solid;
+		border-color: #666666;
+		background-color: #37393a;
+		vertical-align: middle;
+		/*background-color: #dedede;*/
+	}
+	
+	table td {
+		text-align: center;
+		border-width: 1px;
+		padding: 2px 5px;
+		border-style: solid;
+		border-color: #666666;
+		text-align: center;
+		/*background-color: #ffffff;*/
+	}
+    #limitYear{
+        width: 40px;
+        text-align: center;
+    }
+    #info b{
+        font-size:24px;
+        color: red;
+    }
+    #countdone{
+        margin-left: 2em;
+    }
+    button{
+        margin:4px;
+    }
+    #start{
+        margin-left: 4em;
+    }
+    .box>div{
+        width: 45%;
+        float: left;
+margin-top: 1em;
+box-sizing: border-box;
+    }
+    .box .l{
+margin-left:  5%;
+    }
+    .box .r{
+        text-align: left;
+        padding-left:2em;
+    }
+        </style>
+</head>
+
+<body>
+    <p><a href="opensite.html">批量域名site</a>|<a href="dfz.html">域名分组</a>|<a href="get-history.html">域名历史</a></p>
+    域名历史：请输入域名（一行一个）:<br>
+    <div class="box">
+        <div class="l">
+                <textarea id="domains">xzib.cn
+kst-gd.com</textarea>
+        </div>
+        <div class="r">
+                历史年数：只查看<input type="text" id="limitYear" value="2018">年以前的数据 <br>
+                查询选项：<button id="allcheck">【全选】</button><button id="nocheck">【全不选】</button>
+                
+        </div>
+        <br style="clear:both">
+    </div>
+    
+    <br>
+    状态：<span id="info">待查询</span><span id="countdone">0</span>/<span id="allurl">2</span>
+
+    <button id="start">开始查询</button>
+    <button id="clear">清除结果</button>
+
+    <hr>
+    <table>
+        <thead>
+            <th>域名</th>
+            <th><label  for="history">历史年数</label><input type="checkbox"  id="history" name="box"></th>
+            <th><label  for="baidu">百度收录</label><input type="checkbox" id="baidu" name="box"></th>
+            <th><label  for="baiduTitle">百度收录的第一页标题</label><input type="checkbox" id="baiduTitle" name="box"></th>
+            <th><label  for="so360">360收录</label><input type="checkbox" id="so360" name="box"></th>
+            <th><label  for="beian">备案号</label><input type="checkbox" id="beian" name="box"></th>
+            <th width="300"><label  for="titleDefault">TDK</label><input type="checkbox" id="titleDefault" name="box"></th>
+            <th width="300"><label  for="titleSpider">TDK(蜘蛛)</label><input type="checkbox" id="titleSpider" name="box"></th>
+        </thead>
+        <tbody id="re">
+
+        </tbody>
+    </table>
+
+    <script>
+        var max;
+        var t;
+        var info = document.getElementById("info");
+        $(document).ready(function () {
+            baidu
+            $("#baidu").click(function () {
+                if( document.getElementById("baidu").checked){
+                    document.getElementById("baiduTitle").checked = true;
+                }
+            })
+            $("#allcheck").click(function () {
+                document.getElementById("history").checked = true;
+                document.getElementById("baidu").checked = true;
+                document.getElementById("baiduTitle").checked = true;
+                document.getElementById("so360").checked = true;
+                document.getElementById("beian").checked = true;
+                document.getElementById("so360").checked = true;
+                document.getElementById("titleDefault").checked = true;
+                document.getElementById("titleSpider").checked = true;
+            });
+            $("#nocheck").click(function () {
+                document.getElementById("history").checked = false;
+                document.getElementById("baidu").checked = false;
+                document.getElementById("baiduTitle").checked = false;
+                document.getElementById("so360").checked = false;
+                document.getElementById("beian").checked = false;
+                document.getElementById("so360").checked = false;
+                document.getElementById("titleDefault").checked = false;
+                document.getElementById("titleSpider").checked = false;
+            });
+
+
+            $("#start").click(function () {
+
+                var history=(document.getElementById("history").checked)?"1":"0";
+                var baidu=(document.getElementById("baidu").checked)?"1":"0";
+                var so360=(document.getElementById("so360").checked)?"1":"0";
+                var beian=(document.getElementById("beian").checked)?"1":"0";
+                var titleDefault=(document.getElementById("titleDefault").checked)?"1":"0";
+                var titleSpider=(document.getElementById("titleSpider").checked)?"1":"0";
+                so360=(beian=="1")?"1":so360;
+
+                t=Date.parse(new Date());
+                var textarea = document.getElementById("domains").value;
+                var dArr = textarea.split(/[(\r\n)\r\n]+/);
+
+                document.getElementById("allurl").innerText=dArr.length;
+
+                var limitYear=document.getElementById("limitYear").value;
+
+                go(dArr,0,limitYear,history,baidu,so360,titleDefault,titleSpider)
+
+
+            });
+
+
+        });
+
+        function go(dArr, n,limitYear,h,b,s,td,ts) {
+            var d=dArr[n];
+
+
+            var domain = encodeURIComponent(d);
+   
+            info.innerHTML = "查询中";
+
+            var url = "getHistory.php?d=" + domain+"&h="+h+"&b="+b+"&s="+s+"&td="+td+"&ts="+ts;
+
+            $.get(url, function (r) {
+                //{"is_live":false,"last_ts":null,"first_ts":null,"years":{}}
+                //{"last_ts":"20190103013517","first_ts":"20010630231440","years":{"2016":[1,0,0,0,0,0,0,0,0,1,0,0],"2015":[0,0,0,0,0,0,0,1,0,0,0,0]}}
+                //-1
+                //-2
+                info.innerHTML = "<b>查询完成</b>";
+
+                var markYears = 0;
+                var history="Null";
+                var baidu="Null";
+                var so360="Null";
+                var beian="Null";
+                var titleDefault="Null";
+                var titleSpider="Null";
+                if (r == "-1") {
+                    markYears = "参数错误";
+                } else if (r == "-2") {
+                    markYears = "网络错误";
+                } else {
+                    const ar=r.split("|+|");
+                    history=ar[0];
+                    baidu=ar[1];
+                    so360=ar[2];
+                    beian=ar[3];
+                    titleDefault=ar[4];
+                    titleSpider=ar[5];
+
+                    console.log(history);
+                    if(history==""||history=="-"){
+                        history=history
+                    }else if(history.indexOf("服务器")!=-1){
+                        history="服务器错误";
+                        
+                    // }else if(history.length>5){
+                    //     history="服务器错误,长度为"+history.length;
+                    //     console.log(history);
+                    }else{
+                        history = JSON.parse(history);
+                       
+                        if ($.isEmptyObject(history.years)) {
+                           markYears = 0;
+                        } else {
+                            var y = history.years;
+
+                            console.log(y);
+                            for (k in y) {
+                                var markMonth = 0;
+                                if (k < limitYear) {
+
+                                    var yk = y[k];
+                                    for (v in yk) {
+
+                                        if (yk[v] > 0) {
+                                            markMonth++;
+                                        };
+                                    }
+                                }
+                                if (markMonth > 0) {
+                                    console.log(k + " is good");
+                                    markYears++;
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+                var count_baidu=baidu.split("|@|")[0];
+                var title_baidu="Null";
+                if(document.getElementById("baiduTitle").checked){title_baidu=baidu.split("|@|")[1];}
+                if(count_baidu!=0){
+                    count_baidu="<a href='https://www.baidu.com/s?wd=site:"+domain+"' target='_blank'><b>"+count_baidu+"<b></a>";
+                }
+                if(so360!=0){
+                    so360="<a href='https://www.so.com/s?q=site:"+domain+"' target='_blank'><b>"+so360+"<b></a>";
+                }
+
+                beian="<a href='https://www.so.com/s?q=site:"+domain+"' target='_blank'>"+beian+"</a>";
+                $("#re").prepend("<tr>"
+                +"<td>" + d + "</td>"
+                +"<td>" + markYears + "</td>"
+                +"<td>" + count_baidu + "</td>"
+                +"<td>" + title_baidu + "</td>"
+                +"<td>" + so360 + "</td>"
+                +"<td>" + beian + "</td>"
+                +"<td>" + titleDefault + "</td>"
+                +"<td>" + titleSpider + "</td>"
+                +"</tr>");
+
+                if((n+1)<dArr.length){
+                    go(dArr, n+1,limitYear,h,b,s,td,ts)
+                }else{
+                    t=(Date.parse(new Date())-t)/1000;
+
+                    $("#re").append("<tr><td>总耗时</td><td colspan='7'>" + t + "</td></tr>");
+
+                    $("#re").append("<tr><td>平均耗时</td><td colspan='7'>" + t/dArr.length + "</td></tr>");
+                }
+                document.getElementById("countdone").innerText=n+1;
+            });
+        }
+
+        document.getElementById("clear").onclick = function () {
+
+            document.getElementById("re").innerHTML = "";
+
+            info.innerHTML = "清除完成";
+        }
+    </script>
+</body>
+
+</html>

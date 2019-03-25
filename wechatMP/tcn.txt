@@ -1,0 +1,48 @@
+http://t.cn/E5wRFie
+http://www.hades00.com/18350193726_82.html
+http://www.hades00.com/MYnfZxQH.shtml
+http://www.t8158.com
+
+短链接：
+http://t.cn/E5OQg2t?from=groupmessage&isappinstalled=0
+
+解密为长链接：title : jump （域名）
+http://www.hades88.com/71569735406_100.html
+
+<title>Jump</title>
+<script>
+setTimeout(function(){
+	top.location.href=randomString(8) + ".shtml";
+},50);
+function randomString(len) {
+	len = len || 32;
+	var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+	var maxPos = $chars.length;
+	var pwd = '';
+	for (i = 0; i < len; i++) {
+		pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+	}
+	return pwd;
+}
+</script>
+
+跳转到一个页面这个域名下的其它网址，内容都是一样的
+http://www.hades88.com/8BrdENiC.shtml
+http://www.hades88.com/aDf2FwES.shtml
+<title>幸运彩票</title>
+iframe 内嵌一个真正的网址  https://jj1806.com/home
+
+	function onBridgeReady() {
+		WeixinJSBridge.call('hideOptionMenu');
+	}
+
+	if (typeof WeixinJSBridge == "undefined") {
+		if (document.addEventListener) {
+			document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+		} else if (document.attachEvent) {
+			document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+			document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+		}
+	} else {
+		onBridgeReady();
+	}

