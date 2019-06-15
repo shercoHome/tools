@@ -85,7 +85,7 @@ class api
         $this->defaultPlanQi='2';//默认几期
         $this->defaultPlanPosition='0';//默认玩法
         $this->defaultNumbers='1';//默认几码
-        $this->mark1='isNull';//备注1
+        $this->mark1='0';//备注1 排序（数字大在前）
         $this->mark2='isNull';//备注2
         $this->mark3='isNull';//备注1
         $this->mark4='isNull';//备注1
@@ -170,18 +170,30 @@ class api
         }
 
         $sql="SELECT * FROM api ";
+        $sql.=" WHERE 1 ";
         if (array_key_exists("lotteryID", $userinfo)) { //
             $this->lotteryID=$userinfo ["lotteryID"]; 
-            $sql="SELECT * FROM api WHERE lotteryID='$this->lotteryID' ";  
+            $sql.=" AND lotteryID='$this->lotteryID' ";  
         }
         if (array_key_exists("id", $userinfo)) { //
             $this->id=$userinfo ["id"]; 
-            $sql="SELECT * FROM api WHERE id='$this->id' ";  
+            $sql.=" AND lid='$this->id' ";  
         }
+        if (array_key_exists("switch", $userinfo)) { //
+            $this->id=$userinfo ["switch"]; 
+            $sql.=" AND lswitch='$this->switch' ";  
+        }
+        
 
-        if (array_key_exists("n", $userinfo)) { //
+        if (array_key_exists("n", $userinfo)) { 
+            $page=1;
+            if (array_key_exists("page", $userinfo)) { 
+                $page = $userinfo ["page"]; 
+            }
             $n=$userinfo ["n"]; 
-            $sql.=" limit ".$n;
+            $m = ($page - 1) * $n;
+            $sql .= " limit $m, $n";
+
         }
 
         $result = mysqli_query($conn, $sql);

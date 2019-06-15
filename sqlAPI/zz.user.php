@@ -96,7 +96,7 @@ if (is_array($_POST)&&count($_POST)>0) {
                     echo json_encode(updateUser($userID, $token, $formKey, $formValue));
                     break;
                 case 'getAPI':
-                    echo json_encode(getApi());
+                    echo json_encode(getApi($aff));
                     break;
                     break;
                 case 'webSet':
@@ -209,11 +209,52 @@ function updateUser($userID, $token, $formKey, $formValue)
         return array("code"=>"0","msg"=>"修改出错<br>updateUser: false","data"=>$re_update);
     }
 }
-function getApi()
+function getApi($aff)
 {
+
+
+    
+    $array_plansForThisSite=array();
+    if ($aff!="admin") {
+        // $info['switch']='1';
+
+        require_once 'class.websetting.php';
+        $DBwebsetting=new websetting();
+        $webInfo=array("siteLink"=>$aff);
+        $json_set=$DBwebsetting->show($webInfo);
+        if ($json_set!==false) {
+            $json_set=$json_set[0];
+            $str_plansForThisSite=$json_set["mark4"];//此站点开放的计划
+            // 
+
+           // $str_plansForThisSite="pk10-js||pk10-js-xy||lucky-air-ship||ffssc||pc28||pk10-bj||vr-sxffc||cqssc||ffssclt";
+            //转为数组
+            $array_plansForThisSite=explode("||", $str_plansForThisSite);
+        }
+    } else {
+        $array_plansForThisSite='allForAdmin';
+    }
     require_once 'class.api.php';
     $DBapi=new api();
     $re_api=$DBapi->show();
+
+
+    $re_api_temp=array();
+    if ($array_plansForThisSite!=='allForAdmin') {
+      
+        foreach ($re_api as $apiJson) {
+            $lotteryID = $apiJson['lotteryID'];
+            if (in_array($lotteryID, $array_plansForThisSite)) {
+                array_push($re_api_temp, $apiJson);
+               
+            }
+        
+        }
+     
+    }
+    $re_api=$re_api_temp;
+       
+
     if ($re_api!==false) {
         $json_result=array("code"=>"1","msg"=>"getApi success","data"=>$re_api);
     } else {
@@ -298,7 +339,7 @@ function reLogin($userID, $token)
                     $userInfo['authorizationStatus']="1";
                     $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
                 }
-            } else if($hisStatus=="1"){
+            } elseif ($hisStatus=="1") {
                 $t1= strtotime($hisTime);
                 $t2=strtotime("-".$hisLimite." days");
                 if ($t1<$t2 && $hisLimite!="0") {//到期
@@ -311,7 +352,7 @@ function reLogin($userID, $token)
                     $userInfo['authorizationStatus']="0";
                     $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
                 }
-            }else{
+            } else {
                 $t1= strtotime($hisTime);
                 $t2=strtotime("-".$hisLimite." days");
                 if ($t1<$t2 && $hisLimite!="0") {//到期
@@ -340,7 +381,6 @@ function reLogin($userID, $token)
             $userInfo['aff']= "http://".$json_set['siteLink'];
             $userInfo['shareCount']=$shareCount;
             $userInfo['shareRequiredIP']=$json_set['shareRequiredIP'];
-            
         } else {
             // echo shareCode 不正确？ 程序出错了
         }
@@ -439,7 +479,7 @@ function userLogin($name, $psw, $aff, $fromLink)
                             $userInfo['authorizationStatus']="1";
                             $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
                         }
-                    } else if($hisStatus=="1"){
+                    } elseif ($hisStatus=="1") {
                         $t1= strtotime($hisTime);
                         $t2=strtotime("-".$hisLimite." days");
                         if ($t1<$t2 && $hisLimite!="0") {//到期
@@ -452,7 +492,7 @@ function userLogin($name, $psw, $aff, $fromLink)
                             $userInfo['authorizationStatus']="0";
                             $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
                         }
-                    }else{
+                    } else {
                         $t1= strtotime($hisTime);
                         $t2=strtotime("-".$hisLimite." days");
                         if ($t1<$t2 && $hisLimite!="0") {//到期
@@ -490,12 +530,10 @@ function userLogin($name, $psw, $aff, $fromLink)
                     $userInfo['aff']= "http://".$json_set['siteLink'];
                     $userInfo['shareCount']=$shareCount;
                     $userInfo['shareRequiredIP']=$json_set['shareRequiredIP'];
-                    
                 } else {
                     // echo shareCode 不正确？ 程序出错了
 
                     $userInfo['checkShareCode']=$checkShareCode;
-                    
                 }
                 
 

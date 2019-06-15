@@ -201,7 +201,8 @@ $_SESSION["token"] = $token;
         );
         $WinRate=new WinRate($info);
 
-        //var_dump($WinRate);
+        // var_dump($WinRate);
+        // return;
         if ($id==-1) {
             echo json_encode($WinRate->getAllRate());
         } else {

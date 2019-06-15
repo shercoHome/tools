@@ -8,8 +8,9 @@ $startTime = microtime(true);
 $endTime = microtime(true);
 $runTime = ($endTime-$startTime)*1000 . ' ms';
 
- //getApi();
+//  getApi();
 
+// return;
  ////开奖时间，13:09~~ 次日 04：04
 if (date("G")<5||date("G")>12) {
     
@@ -35,7 +36,9 @@ function getApi()
     $api="http://data.365rich.com/data/lottery/result/list?token=sWk2WzDa8MBg4679&type=3004&count=1";//&period=726945
     //[{"period":"726937","numbers":["7","3","1","6","4","5","8","2","10","9"],
     $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=jspk10";
-    $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=xyft";
+    $api="http://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=xyft";
+    $api="https://lucky.sdtiop.com/hall/pc/lottery/get-recent-close-expect.html?code=xyft";
+    
     //{"id":2807912,"expect":"201901310859","code":"jspk10","type":"pk10","openCode":"07,01,02,04,05,03,08,06,09,10",
     //"openTime":1548915540000,"closeTime":1548915530000,"openingTime":1548915470000,"gatherTime":1548915540853,
     //"origin":"1","date":null,"orderNum":null,
@@ -44,6 +47,8 @@ function getApi()
     $result=getHtml($api);
 
     $json=json_decode($result);
+
+   
 
     if ($json!=null) {
         if (gettype($json)=="array") {
@@ -78,9 +83,30 @@ function getApi()
             }
         } elseif (gettype($json)=="object") {
             if (property_exists($json, "data")) {
-                $expect=$json->data[0]->expect;
+
+                $data__=$json->data;
+
+                if (gettype($json->data)=="array") {
+                    $data__=$json->data[0];
+                }
+                $expect=$data__->expect;
+                $opencode=$data__->openCode;
+                $open_time = date('Y-m-d H:i:s', ($data__->openTime)/1000);
+                ;
                 //  var_dump($expect);
-   
+                if ($opencode==null) {
+                    echo "<br>--opencode--null----";
+                    return false;
+                }
+
+                $json_new=(object)array("data"=>array((object)array("expect"=>$expect,"opencode"=>$opencode,"opentime"=>$open_time)));
+                $json=$json_new;
+                $result=json_encode($json);
+
+
+
+                $expect=$json->data[0]->expect;
+
                 $file_name=$expect;
                 $str=$result;
    

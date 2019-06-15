@@ -23,7 +23,7 @@ do{
 
    echo $m." ___ ";
     
-echo $runTime." ___ /n";
+   echo $runTime." ___ /n";
 
 }while($runTime<5*60 && !$api_statu);
  

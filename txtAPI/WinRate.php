@@ -397,10 +397,13 @@ class WinRate
                 // array_push($txt_filename_qihao, $filename);//尾部添加  0,726528~32,726560
                 //array_unshift($txt_filename_qihao,$filename);//头部添加元素
                 $kj= $this->get_file_content($dir."/".$filename);
+                if($kj==''){continue;}
                 $kj_json=json_decode($kj);
-                $key=$kj_json->data[0]->expect;
-                $val=$kj_json->data[0]->opencode;
-                $kj_qihao_value[$key]=$val;
+                if(property_exists($kj_json, "data")){
+                    $key=$kj_json->data[0]->expect;
+                    $val=$kj_json->data[0]->opencode;
+                    $kj_qihao_value[$key]=$val;
+                }
             }
         }
         // 5、关闭目录

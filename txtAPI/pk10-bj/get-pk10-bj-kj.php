@@ -6,59 +6,54 @@ $interval=2;// ÿ��4s����
 
 $startTime = microtime(true);
 $endTime = microtime(true);
-$runTime = ($endTime-$startTime)*1000 . ' ms'; 
+$runTime = ($endTime-$startTime)*1000 . ' ms';
 
  //getApi();
   ////开奖时间，13:09~~ 次日 04：04
 
-    do{
-    $api_statu=getApi();  
-    sleep($interval);
+    do {
+        $api_statu=getApi();
+        sleep($interval);
 
 
-    $endTime = microtime(true);
-    $runTime = $endTime-$startTime;
+        $endTime = microtime(true);
+        $runTime = $endTime-$startTime;
 
-    $m=gmstrftime('%M:%S',$runTime);
+        $m=gmstrftime('%M:%S', $runTime);
 
 
-    echo $m." ___ ";
+        echo $m." ___ ";
         
-    echo $runTime." ___ /n";
-
-    }while($runTime<5*60 && !$api_statu);
-
-
-function getApi(){
+        echo $runTime." ___ \n";
+    } while ($runTime<20*60 && !$api_statu);
 
 
-$api='http://t.apiplus.net/newly.do?code=bjpk10&format=json';
-$api="http://data.365rich.com/data/lottery/result/list?token=sWk2WzDa8MBg4679&type=3004&count=1";//&period=726945
-//[{"period":"726937","numbers":["7","3","1","6","4","5","8","2","10","9"],
-$api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=bjpk10";
-//{"id":2807912,"expect":"201901310859","code":"jspk10","type":"pk10","openCode":"07,01,02,04,05,03,08,06,09,10",
-    //"openTime":1548915540000,"closeTime":1548915530000,"openingTime":1548915470000,"gatherTime":1548915540853,
-    //"origin":"1","date":null,"orderNum":null,
-    //"fmOpenTime":"2019-01-31 14:19:00","codeMemo":"����PK10","leftTime":0,"leftOpenTime":0},
-   // $result=file_get_contents($api);
-$result=getHtml($api);
+function getApi()
+{
+    $api='http://t.apiplus.net/newly.do?code=bjpk10&format=json';
+    $api="http://data.365rich.com/data/lottery/result/list?token=sWk2WzDa8MBg4679&type=3004&count=1";//&period=726945
+    //[{"period":"726937","numbers":["7","3","1","6","4","5","8","2","10","9"],
+    $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=bjpk10";
+    //array: [{"id":3316069,"expect":"734605","code":"bjpk10","type":"pk10","openCode":"08,04,03,10,01,09,02,05,06,07","openTime":1560069000000,"closeTime":1560068880000,"openingTime":1560067680000,"gatherTime":1560069349790,"origin":"1","date":null,"advanceOpen":false,"orderNum":null,"fmOpenTime":"2019-06-09 16:30:00","codeMemo":"北京PK10","leftTime":0,"leftOpenTime":0},{"id":3316068,"expect":"734604","code":"bjpk10","type":"pk10","openCode":"10,04,01,06,05,03,08,07,09,02","openTime":1560067800000,"closeTime":1560067680000,"openingTime":1560066480000,"gatherTime":1560068147072,"origin":"1","date":null,"advanceOpen":false,"orderNum":null,"fmOpenTime":"2019-06-09 16:10:00","codeMemo":"北京PK10","leftTime":0,"leftOpenTime":0},{"id":3316067,"expect":"734603","code":"bjpk10","type":"pk10","openCode":"08,09,03,01,06,05,07,04,10,02","openTime":1560066600000,"closeTime":1560066480000,"openingTime":1560065280000,"gatherTime":1560066947611,"origin":"1","date":null,"advanceOpen":false,"orderNum":null,"fmOpenTime":"2019-06-09 15:50:00","codeMemo":"北京PK10","leftTime":0,"leftOpenTime":0},{"id":3316066,"expect":"734602","code":"bjpk10","type":"pk10","openCode":"07,09,04,10,02,03,05,06,01,08","openTime":1560065400000,"closeTime":1560065280000,"openingTime":1560064080000,"gatherTime":1560065747468,"origin":"1","date":null,"advanceOpen":false,"orderNum":null,"fmOpenTime":"2019-06-09 15:30:00","codeMemo":"北京PK10","leftTime":0,"leftOpenTime":0},{"id":3316065,"expect":"734601","code":"bjpk10","type":"pk10","openCode":"10,06,04,01,08,09,05,03,07,02","openTime":1560064200000,"closeTime":1560064080000,"openingTime":1560062880000,"gatherTime":1560064548344,"origin":"1","date":null,"advanceOpen":false,"orderNum":null,"fmOpenTime":"2019-06-09 15:10:00","codeMemo":"北京PK10","leftTime":0,"leftOpenTime":0}]
 
-$json=json_decode ($result);
+    $api="https://lucky.sdtiop.com/hall/pc/lottery/get-recent-close-expect.html?code=bjpk10";
+    //json {"error":0,"data":{"openCodeMemo":null,"expect":"734605","openCode":"08,04,03,10,01,09,02,05,06,07","openTime":1560069000000}}
+    $result=getHtml($api);
 
-if($json!=null){
+    $json=json_decode($result);
 
-
+    if ($json!=null) {
         if (gettype($json)=="array") {
             $expect=$json[0]->expect;
             $opencode=$json[0]->openCode;
         
-            if($opencode==null){
+            if ($opencode==null) {
                 echo "<br>--opencode--null----";
                 return false;
             }
 
-           // $opencode = implode(",", $array_opencode);
-           // $open_time = date('Y-m-d H:i:s', ($json[0]->open_date)/1000);
+            // $opencode = implode(",", $array_opencode);
+            // $open_time = date('Y-m-d H:i:s', ($json[0]->open_date)/1000);
             $open_time = $json[0]->fmOpenTime;
             $json_new=(object)array("data"=>array((object)array("expect"=>$expect,"opencode"=>$opencode,"opentime"=>$open_time)));
             $json=$json_new;
@@ -71,35 +66,57 @@ if($json!=null){
             $str=$result;
    
             $t=$json->data[0]->opentime;
-            $opentime=strtotime ($t);
+            $opentime=strtotime($t);
             $today=date("Y-m-d")." 00:00:00";
             $today=strtotime($today);
 
-            if($opentime>$today){
+            if ($opentime>$today) {
                 return add($file_name, $str);
             }
         } elseif (gettype($json)=="object") {
+
             if (property_exists($json, "data")) {
-                $expect=$json->data[0]->expect;
+                $data__=$json->data;
+
+                if (gettype($json->data)=="array") {
+                    $data__=$json->data[0];
+                }
+                $expect=$data__->expect;
+                $opencode=$data__->openCode;
+                $open_time = date('Y-m-d H:i:s', ($data__->openTime)/1000);
+                ;
                 //  var_dump($expect);
+                if ($opencode==null) {
+                    echo "<br>--opencode--null----";
+                    return false;
+                }
+
+                $json_new=(object)array("data"=>array((object)array("expect"=>$expect,"opencode"=>$opencode,"opentime"=>$open_time)));
+                $json=$json_new;
+                $result=json_encode($json);
+      
+
+
+                
+                $expect=$json->data[0]->expect;
+              
    
                 $file_name=$expect;
                 $str=$result;
    
                 $t=$json->data[0]->opentime;
-                $opentime=strtotime ($t);
+                $opentime=strtotime($t);
                 $today=date("Y-m-d")." 00:00:00";
                 $today=strtotime($today);
-                if($opentime>$today){
+
+                if ($opentime>$today) {
                     return add($file_name, $str);
                 }
             } else {
                 var_dump($json);
             }
         }
-
-};
-
+    };
 }
 
 
@@ -130,60 +147,61 @@ function getColor($n)
         return "红";
     }
 };
-function add($file_name,$str){
+function add($file_name, $str)
+{
 
 //echo '<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="utf-8"><title>*setTime</title></head><body>';
 
-$mk_dir="txt-kj"; 
+    $mk_dir="txt-kj";
   
     
-$mk_day=date("Ymd");
+    $mk_day=date("Ymd");
 
-// if(date("G")<1){
+    // if(date("G")<1){
 
-//    $mk_day=date("Ymd",strtotime("-1 day"));     
+//    $mk_day=date("Ymd",strtotime("-1 day"));
 
-// }
+    // }
 
-//$file_name=date("Ymd");
+    //$file_name=date("Ymd");
 
-$file_type="txt";
-		
+    $file_type="txt";
+        
 
-$path=$mk_dir."/".$mk_day."/".$file_name.".".$file_type;
+    $path=$mk_dir."/".$mk_day."/".$file_name.".".$file_type;
 
-echo $path."-------";
+    echo $path."-------";
 
-if(!file_exists($mk_dir)){mkdir ($mk_dir);  }
+    if (!file_exists($mk_dir)) {
+        mkdir($mk_dir);
+    }
 
-if(!file_exists($mk_dir."/".$mk_day)){mkdir ($mk_dir."/".$mk_day);  }
+    if (!file_exists($mk_dir."/".$mk_day)) {
+        mkdir($mk_dir."/".$mk_day);
+    }
 
 
-if (!file_exists($path)){
+    if (!file_exists($path)) {
 
        // $str = $file_name;
 
         file_put_contents($path, $str);
 
         echo "create succse \n";
-return true;
+        return true;
+    } else {
+        echo "create false \n";
 
+        return false;
     }
-
-else{
-	echo "create false \n";
-
-return false;
-
-}
-
 }
 
 
-function getHtml($url){
+function getHtml($url)
+{
 
     //$html=file_get_contents($So360);
-   // $useragent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36';
+    // $useragent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36';
     $timeout= 120;
     $dir            = dirname(__FILE__);
     $cookie_file    = $dir . '/cookies/' . md5($_SERVER['REMOTE_ADDR']) . '.txt';
@@ -250,8 +268,8 @@ function getHtml($url){
         'CLIENT-IP:'.$ip,
         'X-FORWARDED-FOR:'.$ip,
     );    //����ip
-    $useragent=$agent_array[array_rand($agent_array,1)];//��������
-    $referurl = $refer_url_array[array_rand($refer_url_array,1)];  //�����Դ��ַreferurl
+    $useragent=$agent_array[array_rand($agent_array, 1)];//��������
+    $referurl = $refer_url_array[array_rand($refer_url_array, 1)];  //�����Դ��ַreferurl
 
   //  $header = array("Connection: Keep-Alive","Accept: text/html, application/xhtml+xml, */*", "Pragma: no-cache", "Accept-Language: zh-Hans-CN,zh-Hans;q=0.8,en-US;q=0.5,en;q=0.3","User-Agent: Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)",'CLIENT-IP:'.$ip,'X-FORWARDED-FOR:'.$ip);
 
@@ -260,24 +278,22 @@ function getHtml($url){
     curl_setopt($ch, CURLOPT_HEADER, 0);
     curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
     curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true );
-    curl_setopt($ch, CURLOPT_ENCODING, "" );
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
-    curl_setopt($ch, CURLOPT_AUTOREFERER, true );
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout );
-    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout );
-    curl_setopt($ch, CURLOPT_MAXREDIRS, 10 );
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_ENCODING, "");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
 
     curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
     curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
     curl_setopt($ch, CURLOPT_REFERER, $referurl);
     $html = curl_exec($ch);
-    if(curl_errno($ch))
-    {
+    if (curl_errno($ch)) {
         return 'error:' . curl_error($ch);
     }
  
     curl_close($ch);
     return $html;
 }
-?>

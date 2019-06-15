@@ -1,0 +1,125 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <title>【Ε尊囯際】娛楽平台</title>
+    <meta name="description" content="注册、登录、查看免费计划、APP下载……">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <meta name="keywords" content="免费,简单,E尊官网,丰富">
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon" />
+
+</head>
+
+<body>
+
+
+    <style>
+        body {
+            background-color: #212a3b;
+            color: #fff;
+            text-align: center;
+        }
+
+        a {
+            color: #fff;
+        }
+
+        li {
+            margin-top: 0.5em;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        .logo {
+            position: absolute;
+            top: 5vw;
+            left: 5vw;
+            width: 35vw;
+        }
+    </style>
+    <img class="logo" src="/icon.png" />
+    <div id="weixin-tip">
+        <p><img src="/wx-ios.png" alt="微信打开" /></p>
+    </div>
+
+    <script>
+
+        //跳转到哪个网址   www.xxxx.cn   xxxx填写在下面
+        var appName = ["/a", "/b", "/x", "/d", "/l"];
+        var __pathname = window.location.pathname;
+        var __url = "";
+        appName.forEach(element => {
+            if (__pathname.indexOf(element) !== -1) {
+                __url = element;
+            }
+        });
+        __url="http://wwfish.com"+__url;
+
+
+        var u = navigator.userAgent;
+        var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+        var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+        var WeixinDiv = document.getElementById('weixin-tip');
+        var isWeixin = is_weixin();
+        var isQQ = is_QQInnerBro();
+        if (isWeixin || isQQ) {
+            WeixinDiv.style.display = 'block';
+            if (isAndroid) {
+                WeixinDiv.innerHTML = '<p><img src="/wx-a.png" alt="微信打开"/></p>';
+            } else if (isiOS) {
+                WeixinDiv.innerHTML = '<p><img src="/wx-ios.png" alt="微信打开"/></p>';
+            }
+        } else {
+            WeixinDiv.style.display = 'none';
+            if (__url != "") document.location = __url;
+        }
+        // 判断是不是微信浏览器
+        function is_weixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        //判断是不是QQ浏览器
+        function is_QQInnerBro() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/qq\//i) == "qq/") {
+                return true;
+            } else {
+                return false;
+            }
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>

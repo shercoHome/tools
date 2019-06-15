@@ -35,9 +35,12 @@ function getApi()
     $api='http://t.apiplus.net/newly.do?code=bjpk10&format=json';
     $api="http://data.365rich.com/data/lottery/result/list?token=sWk2WzDa8MBg4679&type=3004&count=1";//&period=726945
     //[{"period":"726937","numbers":["7","3","1","6","4","5","8","2","10","9"],
+    $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=bjpk10";
     $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=jspk10";
     $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=xyft";
     $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=ffssc";
+
+    $api="https://lucky.sdtiop.com/hall/pc/lottery/get-recent-close-expect.html?code=ffssc";//
     //{"id":2807912,"expect":"201901310859","code":"jspk10","type":"pk10","openCode":"07,01,02,04,05,03,08,06,09,10",
     //"openTime":1548915540000,"closeTime":1548915530000,"openingTime":1548915470000,"gatherTime":1548915540853,
     //"origin":"1","date":null,"orderNum":null,
@@ -115,9 +118,66 @@ function getApi()
             }
         } elseif (gettype($json)=="object") {
             if (property_exists($json, "data")) {
-                $expect=$json->data[0]->expect;
+
+                $data__=$json->data;
+
+                if (gettype($json->data)=="array") {
+                    $data__=$json->data[0];
+                }
+                $expect=$data__->expect;
+                $opencode=$data__->openCode;
+                $open_time = date('Y-m-d H:i:s', ($data__->openTime)/1000);
+                ;
                 //  var_dump($expect);
-   
+                if ($opencode==null) {
+                    echo "<br>--opencode--null----";
+                    return false;
+                }
+////////////////////////////
+           /////////////////////////////////
+            //开奖号码转为数组
+            $array_opencode=explode(",", $opencode);
+
+            //定位胆
+            $str1=$opencode;
+
+            //大小定位
+            $str2=getSize($array_opencode[0]).",".getSize($array_opencode[1]).",".getSize($array_opencode[2]).",".getSize($array_opencode[3]).",".getSize($array_opencode[4]);
+  
+            //单双定位
+            $str3=getOddOrEven($array_opencode[0]).",".getOddOrEven($array_opencode[1]).",".getOddOrEven($array_opencode[2]).",".getOddOrEven($array_opencode[3]).",".getOddOrEven($array_opencode[4]);
+
+            //和值
+            $opencode_sum = array_sum($array_opencode);
+            $str4=getSumSize($opencode_sum).",".getOddOrEven($opencode_sum).",".getSumSize($opencode_sum).getOddOrEven($opencode_sum);
+
+            //五星定胆
+            $str5=implode("||", $array_opencode);
+
+            //组三
+            $str6=getABB($array_opencode[0], $array_opencode[1], $array_opencode[2]).",".getABB($array_opencode[1], $array_opencode[2], $array_opencode[3]).",".getABB($array_opencode[2], $array_opencode[3], $array_opencode[4]);
+
+            //组六
+            $str7=getABC($array_opencode[0], $array_opencode[1], $array_opencode[2]).",".getABC($array_opencode[1], $array_opencode[2], $array_opencode[3]).",".getABC($array_opencode[2], $array_opencode[3], $array_opencode[4]);
+
+
+
+        
+            $opencode = $str1."|||".$str2."|||".$str3."|||".$str4."|||".$str5."|||".$str6."|||".$str7;
+            ////////////////////////////
+            echo $opencode;
+
+
+
+                //////////////////////////////
+                $json_new=(object)array("data"=>array((object)array("expect"=>$expect,"opencode"=>$opencode,"opentime"=>$open_time)));
+                $json=$json_new;
+                $result=json_encode($json);
+
+
+//////////////////////////////////
+                $expect=$json->data[0]->expect;
+
                 $file_name=$expect;
                 $str=$result;
    

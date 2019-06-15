@@ -13,7 +13,22 @@ $authorizeID="";
 $shareCode="";
 $userLevel="";
 $fromUserID="";
+// $page=1;
+// $n=10;
 if (is_array($_POST)&&count($_POST)>0) {
+    if (isset($_POST["page"])) {
+        if (strlen($_POST["page"])>0) {
+            $page=$_POST["page"];
+        }
+    }
+    if (isset($_POST["n"])) {
+        if (strlen($_POST["n"])>0) {
+            $n=$_POST["n"];
+        }
+    }
+
+
+
     if (isset($_POST["uid"])) {
         if (strlen($_POST["uid"])>0) {
             $userID=$_POST["uid"];
@@ -97,6 +112,9 @@ if (is_array($_POST)&&count($_POST)>0) {
                 case "getLogSubmitList":
                     $json_result=getLogSubmitList($userID, $token);
                     break;
+                case "getLimitsByID":
+                    $json_result=getLimitsByID($userID, $token,$childID);
+                    break;
                 case "getAdminLimits":
                     $json_result=getAdminLimits($userID, $token,$userName);
                     break;
@@ -129,7 +147,7 @@ if (is_array($_POST)&&count($_POST)>0) {
                     $json_result=updateMyAuthorizeList($userID, $token,$authorizeID,$wbStatus);
                     break;
                 case "getMyAuthorizeList":
-                    $json_result=getMyAuthorizeList($userID, $token);
+                    $json_result=getMyAuthorizeList($userID, $token, $childID);
                     break;
                 case "insertAuthorization":
                     $json_result=insertAuthorization($userID, $token,$userName,$wbStatus);
@@ -167,10 +185,10 @@ if (is_array($_GET)&&count($_GET)>0) {
                 createCDagent('zhangsan', '123qwe', '3', 'zhangsan.duke.com', '王老五');
                 createCDagent('lisi', '123qwe', '3', 'lisi.duke.com', '王老五');
                 createCDagent('zhaoliu', '123qwe', '3', 'zhaoliu.duke.com', '王老五');
-                $n = createCDagent('wangwu1', '123qwe', '4', 'wangwu1.duke.com', '王老五');
-                $m = createCDagent('wangwu2', '123qwe', '4', 'wangwu2.duke.com', '王老五');
-                createCDagent('wangwu11', '123qwe', $n, 'wangwu11.duke.com', '王老五');
-                createCDagent('wangwu12', '123qwe', $m, 'wangwu12.duke.com', '王老五');
+                $_n = createCDagent('wangwu1', '123qwe', '4', 'wangwu1.duke.com', '王老五');
+                $_m = createCDagent('wangwu2', '123qwe', '4', 'wangwu2.duke.com', '王老五');
+                createCDagent('wangwu11', '123qwe', $_n, 'wangwu11.duke.com', '王老五');
+                createCDagent('wangwu12', '123qwe', $_m, 'wangwu12.duke.com', '王老五');
             };
             if ($_GET["t"]=='getMySiteSetting') {
                 $json_result=getMySiteSetting($_GET["id"]);
@@ -417,6 +435,50 @@ function getLogSubmitList($userID, $token){
 
 
 }
+function getLimitsByID($userID, $token,$childID){
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>getLimitsByID","data"=>$isLogin);
+    }
+
+    require_once 'class.user.php';
+    $user=new user();
+    $userType=$user->isAdmin(array("id"=>$userID));//userLevel   总代1，次代2，会员3
+    //////////////
+    $isSelf=($userID==$childID);//自己
+
+    $isChild=$user->isAfromB($childID, $userID);//下级
+
+    $isAgent=($userType===true||$userType==='1'||$userType==='2');
+    
+    /////////////
+    $isAdmin=($userType===true);
+
+    if ($isAgent!==true && $isSelf!==true) {
+        return array("code"=>"0","msg"=>"非管理员或本人无法操作<br>getAdminLimits","data"=>$isAgent."+".$isSelf);
+    }
+
+    require_once 'class.adminLimit.php';
+    $DBadminLimit=new adminLimit();
+    
+    $userInfo=array();
+    if($childID!==''){
+        $userInfo['userID']=$childID;
+    }
+   
+
+    $Arr_limit=$DBadminLimit->show($userInfo);
+
+    if($Arr_limit!=false){
+        return array("code"=>"1","msg"=>"获取成功<br>getAdminLimits","data"=>$Arr_limit);
+    }else{
+        return array("code"=>"0","msg"=>"获取失败<br>getAdminLimits","data"=>$Arr_limit);
+    }
+
+
+}
 function getAdminLimits($userID, $token,$userName){
     require_once 'class.logLogin.php';
     $logLogin=new logLogin();
@@ -546,9 +608,9 @@ function createOneUser($userID, $token, $userName, $userLevel, $fromUserID=''){
             }
             $__updateShareCode=$user->update(array("shareCode"=>$__ID));
             if ($__updateShareCode!==true) {
-                return array("code"=>"1","msg"=>"创建会员成功，但是更新分享码失败","data"=>$__updateShareCode);
+                return array("code"=>"1","msg"=>"创建会员成功(初始密码：123456)，但是更新分享码失败","data"=>$__updateShareCode);
             }else{
-                return array("code"=>"1","msg"=>"创建会员成功","data"=>$__ID);
+                return array("code"=>"1","msg"=>"创建会员成功(初始密码：123456)","data"=>$__ID);
             }
         }else{
             return array("code"=>"0","msg"=>"账号不存在，无法操作<br>createOneUser [0-1/2]","data"=>array());
@@ -663,10 +725,10 @@ function createOneUser($userID, $token, $userName, $userLevel, $fromUserID=''){
             $webSetting=new webSetting();
             $__copyWebSetting=$webSetting->copy($creatorID, $childID);
             if ($__copyWebSetting!==true) {
-                return array("code"=>"1","msg"=>"晋升代理成功，但生成代理网站失败<br>createOneUser [3-2]","data"=>$__copyAdminLimit);
+                return array("code"=>"1","msg"=>"晋升代理成功，但生成代理网站失败<br>createOneUser [3-2]","data"=>array("__copyWebSetting"=>$__copyWebSetting,"creatorID"=>$creatorID,"childID"=>$childID));
             }
 
-            return array("code"=>"1","msg"=>"晋升代理成功！<br>createOneUser [3-2]","data"=>array());
+            return array("code"=>"1","msg"=>"晋升代理成功！<br>createOneUser [3-2] success:all","data"=>array("__copyWebSetting"=>$__copyWebSetting,"creatorID"=>$creatorID,"childID"=>$childID));
 
         }else{
             return array("code"=>"0","msg"=>"账号已存在<br>createOneUser [3-3]","data"=>array());
@@ -916,10 +978,12 @@ function getUserByName($userID, $token,$userName){
             //echo "键不存在！";
         }
     }
+    $re_userListOne['nextCount']=-1;
+    if ($userListOne['agentStatus']=='2') {$re_userListOne['nextCount']=-2;}
     //会员是代理
     if ($userListOne['agentStatus']=='1') {
         //此会员（下一级代理）的下级会员情况
-        $re_userList_2=$user->showUserListByAgentID($userListOne['id']);
+        $re_userList_2=$user->showUserListByAgentID(array('agentID'=>$userListOne['id']));
         $re_userList_2_length=$re_userList_2?count($re_userList_2):0;
 
         $re_userListOne['nextCount']=$re_userList_2_length;
@@ -1012,8 +1076,11 @@ function updateMyAuthorizeList($userID, $token,$authorizeID,$wbStatus){
     }
 }
 
-function getMyAuthorizeList($userID, $token){
+function getMyAuthorizeList($userID, $token,$childID=""){
 
+    if($childID===""){
+        $childID=$userID;
+    }
 
     require_once 'class.logLogin.php';
     $logLogin=new logLogin();
@@ -1025,40 +1092,99 @@ function getMyAuthorizeList($userID, $token){
 
     require_once 'class.user.php';
     $re_user=new user();
-    $my_list=$re_user->show(array("id"=>$userID))[0];
+    //////////////
+    if(!is_numeric($childID)){
+        $num_childID=$re_user->show(array("userName"=>$childID));
+        if ($num_childID==false) { //不存在
+            return array("code"=>"0","msg"=>"查找的账号不存在","data"=>$num_childID);
+        }else{
+            $childID=$num_childID[0]['id'];
+        }
+    }
+    $userType=$re_user->isAdmin(array("id"=>$userID));//userLevel   总代1，次代2，会员3
+    $isSelf=($userID==$childID);//自己
+    $isChild=$re_user->isAfromB($childID, $userID);//下级
+    $isAgent=($userType===true||$userType==='1'||$userType==='2');
+    $isAdmin=($userType===true);
+    if ($isAgent!==true) {
+        return array("code"=>"0","msg"=>"非管理员无法操作<br>getMyAuthorizeList","data"=>$isAgent);
+    }
+    if ($isSelf!==true && $isChild!==true) {
+        return array("code"=>"0","msg"=>"非线下或本人无法操作<br>getMyAuthorizeList","data"=>$isChild);
+    }
+    /////////////
 
-    $info=array("agentDirect"=>$userID);
-    $__info=array("agentDirect"=>$userID,"authorizationStatus"=>'1');
+
+    $my_list=$re_user->show(array("id"=>$childID))[0];
+
+    $info=array("agentDirect"=>$childID);
+    $__info=array("agentDirect"=>$childID,"authorizationStatus"=>'1');
 
     if($my_list['agentAdmin']==0){
-        $info=array("agentAdmin"=>$userID);
-        $__info=array("agentAdmin"=>$userID,"authorizationStatus"=>'1');
+        $info=array("agentAdmin"=>$childID);
+        $__info=array("agentAdmin"=>$childID,"authorizationStatus"=>'1');
     }
-    if($my_list['agentTop']==$userID){
-        $info=array("agentTop"=>$userID);
-        $__info=array("agentTop"=>$userID,"authorizationStatus"=>'1');
+    if($my_list['agentTop']==$childID){
+        $info=array("agentTop"=>$childID);
+        $__info=array("agentTop"=>$childID,"authorizationStatus"=>'1');
     }
 
 
   
 
-
+    if (isset($GLOBALS["page"])) {
+        $info["page"]=$GLOBALS['page'];
+        $__info["page"]=$GLOBALS['page'];
+    }
+    if (isset($GLOBALS["n"])) {
+        $info["n"]=$GLOBALS['n'];
+        $__info["n"]=$GLOBALS['n'];
+    }
 
     
     require_once 'class.authorizationWBStatus.php';
     $authorizationWBStatus=new authorizationWBStatus();
-    $re_insert=$authorizationWBStatus->show($info);
+    $re_insert=$authorizationWBStatus->show($info);//特别授权表中的数据
 
+  
     if($re_insert!==false){
   
 
 
-        $___my_list=$re_user->show($__info);
+        $___my_list=$re_user->show($__info);//分享授权来的
+
+
+        
+        $___my_list_result=array();
+        
+        $___my_list_count=count( $___my_list);
+        for ($x=0;$x<$___my_list_count;$x++) {
+
+            $___my_list_One = $___my_list[$x];
+
+            $___my_list_temp=array();
+            $___my_list_temp['id']=$___my_list_One['shareCode'];
+            $___my_list_temp['userID']=$___my_list_One['id'];
+            $___my_list_temp['userName']=$___my_list_One['userName'];
+            $___my_list_temp['wbStatus']='3';
+            $___my_list_temp['loginTime']=$___my_list_One['loginTime'];
+            $___my_list_temp['updateIP']=$___my_list_One['registerIP'];
+            $___my_list_temp['updateTime']=$___my_list_One['authorizationTime'];
+            $___my_list_temp['updater']=$___my_list_One['id'];
+            $___my_list_temp['mark1']=$___my_list_One['mark1'];
+            $___my_list_temp['mark2']=$___my_list_One['mark2'];
+            $___my_list_temp['mark3']=$___my_list_One['mark3'];
+            $___my_list_temp['mark4']=$___my_list_One['mark4'];
+            $___my_list_temp['mark5']=$___my_list_One['mark5'];
+          
+
+            array_push($___my_list_result, $___my_list_temp);
+        }
 
       
 
 
-        $re_insert=array_merge($___my_list,$re_insert);
+        $re_insert=array_merge($___my_list_result,$re_insert);
 
         return array("code"=>"1","msg"=>"获取成功<br>getMyAuthorizeList","data"=>$re_insert);
 
@@ -1081,13 +1207,17 @@ function insertAuthorization($userID, $token,$userName,$wbStatus){
     $isLogin=$logLogin->checkToken($userID, $token);
 
     //////// 检查输入的用户名  开始
-    $re_list=$user->show(array("userName"=>$userName));
-    if($re_list==false){
-        return array("code"=>"0","msg"=>"账号不存在<br>insertAuthorization: userName is not exist","data"=>$re_list);
+    if (!is_numeric($userName)) {
+        $re_list=$user->show(array("userName"=>$userName));
+        if ($re_list==false) {
+            return array("code"=>"0","msg"=>"账号不存在<br>insertAuthorization: userName is not exist","data"=>$re_list);
+        }else{
+            $childID=$re_list[0]['id'];
+        }
+    }else{
+        $childID=$userName;
     }
     //////// 检查输入的用户名  结束
-
-    $childID=$re_list[0]['id'];
 
     $isSelf=($userID==$childID);
     $isChild=$user->isAfromB($childID, $userID);
@@ -1284,6 +1414,31 @@ function doChange($userID, $token, $childID,$form,$formKey,$formValue){
             }else{
                 return array("code"=>"0","msg"=>"修改失败<br>agent doChange ".$form." ","data"=>$re_update);
             }
+        }elseif($form==='adminLimit'){
+
+
+
+            //查询有没有修改权限
+            require_once 'class.adminLimit.php';
+            $DBadminLimit=new adminLimit();
+            $userInfo=array("userID"=>$userID);
+            $Arr_limit=$DBadminLimit->show($userInfo);
+            $json_limit= $Arr_limit[0];
+            //无修改权限
+            if ($json_limit[$formKey]!=='1') {
+                return array("code"=>"0","msg"=>"修改失败<br>agent doChange ".$form.": limit","data"=>$json_limit[$formKey]);
+            }
+
+            $re_update=$DBadminLimit->update(array("userID"=>$childID,$formKey=>$formValue));
+
+            if($re_update){
+                return array("code"=>"1","msg"=>"修改成功<br>agent doChange adminLimit","data"=>$re_update);
+            }else{
+                return array("code"=>"0","msg"=>"修改失败<br>agent doChange adminLimit","data"=>$re_update);
+            }
+
+        }else{
+            return array("code"=>"0","msg"=>"修改失败<br>agent doChange __".$form." ","data"=>$form);
         }
     }
     return $json_result;
@@ -1419,10 +1574,18 @@ function getMyUsers($userID, $token, $userName)//childID
             if ($isAgent===true) {//true 1 2 3 false
 
 
+                if (isset($GLOBALS["page"])) {
+                    $userListInfo["page"]=$GLOBALS['page'];
+                }
+                if (isset($GLOBALS["n"])) {
+                    $userListInfo["n"]=$GLOBALS['n'];
+                }
+
                 if($isAdmin===true &&  $isSelf===true){
-                    $userList=$user->show();
+                    $userList=$user->show($userListInfo);
                 }else{
-                    $userList=$user->showUserListByAgentID($childID);
+                    $userListInfo["agentID"]=$childID;
+                    $userList=$user->showUserListByAgentID($userListInfo);
                 }
 
                 if($userList==false){
@@ -1467,10 +1630,12 @@ function getMyUsers($userID, $token, $userName)//childID
                             //echo "键不存在！";
                         }
                     }
+                    $re_userListOne['nextCount']=-1;
+                    if ($userListOne['agentStatus']=='2') {$re_userListOne['nextCount']=-2;}
                     //会员是代理
                     if ($userListOne['agentStatus']=='1') {
                         //此会员（下一级代理）的下级会员情况
-                        $re_userList_2=$user->showUserListByAgentID($userListOne['id']);
+                        $re_userList_2=$user->showUserListByAgentID(array('agentID'=>$userListOne['id']));
                         $re_userList_2_length=$re_userList_2?count($re_userList_2):0;
 
                         $re_userListOne['nextCount']=$re_userList_2_length;
@@ -1525,10 +1690,31 @@ function getMySiteSetting($userID, $token, $childID)
         }
     }
 
+    if (isset($GLOBALS["page"])) {
+        $webInfo["page"]=$GLOBALS['page'];
+    }
+    if (isset($GLOBALS["n"])) {
+        $webInfo["n"]=$GLOBALS['n'];
+    }
+
+
     if(count($webInfo)==0 && $isSelf){
         return array("code"=>"-2","msg"=>"未查询到信息<br>getMySiteSetting：isSelf err enter =".$childID,"data"=>array());
     }
     $json_set=$DBwebsetting->show($webInfo);
+
+    if($json_set===array()){
+        return array(
+            "code"=>"2",
+            "msg"=>"没有了<br>getMySiteSetting",
+            "data"=>array(
+                'set'=>array($json_set),
+                'limit'=>$json_set
+            )
+        );
+    }
+
+
 
     $userInfo=array("userID"=>$userID);
     $Arr_limit=$DBadminLimit->show($userInfo);
@@ -1550,11 +1736,12 @@ function getMySiteSetting($userID, $token, $childID)
             //     $value="***";
             // }
 
+            //默认显示的信息
             $filterKey = array("id","userID","userName","siteLink","siteName");
             if (in_array($key, $filterKey)) {
                 $re_webArrOne[$key]=$value;
             }
-
+            //此站长可修改的信息
             if ($key!=="id"&&$key!=="userID"&&$key!=="userName"&&$json_limit[$adminLimitKey]!=0) {
                 $re_webArrOne[$key]=$value;
                 $re_limit[$key]=$json_limit[$adminLimitKey];
@@ -1566,10 +1753,11 @@ function getMySiteSetting($userID, $token, $childID)
     $re_arr=array('set'=>$re_webArr,'limit'=>$re_limit);
     //   echo '<hr>';
 
+
     if ($json_set!==false) {
         $json_result=array("code"=>"1","msg"=>"获取成功<br>getMySiteSetting","data"=>$re_arr);
     } else {
-        $json_result=array("code"=>"0","msg"=>"获取出错<br>getMySiteSetting","data"=>$re_arr);
+        $json_result=array("code"=>"0","msg"=>"获取出错<br>getMySiteSetting","data"=>$json_set);
     }
     return $json_result;
 }

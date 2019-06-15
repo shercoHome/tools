@@ -1,0 +1,152 @@
+
+
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>点击查看人工计划</title>
+    <meta name="description" content="免费查看、操作简单、种类、公式多样……">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <meta name="keywords" content="免费,简单,E尊官网,丰富">
+    <link rel="shortcut icon" href="app_icon.png" type="image/x-icon" />
+
+</head>
+<body>
+
+
+        <style>
+                body{
+                    background-color: #212a3b;
+                    color: #fff;
+                    text-align: center;
+                }
+                h1{
+                    display: block;
+                    width: 100%;
+                    text-align: center;
+                    font-size: 100px;
+                    margin-top: 0;
+                }
+
+                a{
+                    color: #fff;
+                }
+                li{
+                    margin-top: 0.5em;
+                }
+                img{
+                    max-width: 100%;
+                }
+
+                .logo{
+                    position: fixed;
+                    top:0;
+                    left:0; 
+                    width:35vw;
+                }
+                </style>
+
+
+
+
+<div id="weixin-tip"><p><img src="wx-ios.png" alt="微信打开"/></p></div>
+
+
+<img class="logo" src="app_icon.png" />
+<h1>免费<br>计划</h1>
+
+
+<!-- <h3>按图操作，用浏览器打开</h3>
+
+
+<h3>马上为您呈现 专属 免费 计划</h3> -->
+
+
+
+<script>
+    //跳转到哪个网址   www.xxxx.cn   xxxx填写在下面
+var appName=["qxjh8","kekejh","xyjh8","jieke2","jieke3","jieke4","jieke5","jieke6","jieke8","jieke9"];
+
+var __hostname=window.location.hostname;
+var __url="";
+appName.forEach(element => {
+   if( __hostname.indexOf(element)!==-1){
+    __url="http://www."+element+".cn";
+   }
+});
+
+
+
+
+
+var u = navigator.userAgent;
+    var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+    var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+    var WeixinDiv = document.getElementById('weixin-tip');
+    var isWeixin = is_weixin();
+    var isQQ = is_QQInnerBro();
+    if(isWeixin || isQQ){
+        WeixinDiv.style.display='block';
+        if(isAndroid){
+            WeixinDiv.innerHTML = '<p><img src="wx-a.png" alt="微信打开"/></p>';
+        }else if(isiOS){
+            WeixinDiv.innerHTML = '<p><img src="wx-ios.png" alt="微信打开"/></p>';        }
+    }else{
+      WeixinDiv.style.display='none';
+
+if(__url!="") document.location = __url;
+     
+        // if(isAndroid){
+        //     document.location = 'https://www.ezun99.com/download/app/ez.apk';
+        // }else if(isiOS){
+        //     document.location = 'itms-services:///?action=download-manifest&url=https://www.ezun99.com/download/app/EZ-iOS.plist';
+        // }else {
+        //     document.write('请用安卓或者苹果设备打开！！');
+        // }
+    }
+    // 判断是不是微信浏览器
+    function is_weixin() {
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //判断是不是QQ浏览器
+    function is_QQInnerBro(){
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.match(/qq\//i) == "qq/") {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

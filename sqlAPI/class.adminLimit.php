@@ -392,10 +392,18 @@ class adminLimit
             $userName=$userinfo ["userName"]; 
             $sql="SELECT a.*,u.userName FROM adminlimit a,user u WHERE a.userID=u.id AND u.userName='$userName' ";
         }
-        if (array_key_exists("n", $userinfo)) { //权限表id
+
+        if (array_key_exists("n", $userinfo)) { 
+            $page=1;
+            if (array_key_exists("page", $userinfo)) { 
+                $page = $userinfo ["page"]; 
+            }
             $n=$userinfo ["n"]; 
-            $sql.=" limit ".$n;
+            $m = ($page - 1) * $n;
+            $sql .= " limit $m, $n";
+
         }
+
         $result = mysqli_query($conn, $sql);
 
         if ($result===false) {

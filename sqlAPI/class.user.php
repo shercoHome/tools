@@ -301,13 +301,17 @@ class user
 
         //$sql.=" ORDER BY l.loginTime DESC";
 
-      
+        if (array_key_exists("n", $userinfo)) { 
+            $page=1;
+            if (array_key_exists("page", $userinfo)) { 
+                $page = $userinfo ["page"]; 
+            }
+            $n=$userinfo ["n"]; 
+            $m = ($page - 1) * $n;
+            $sql .= " limit $m, $n";
 
-
-        if (array_key_exists("n", $userinfo)) { //用户id
-            $n=$userinfo ["n"];
-            $sql.=" limit $n";
         }
+
         $result = mysqli_query($conn, $sql);
 
         if ($result===false) {
@@ -359,7 +363,7 @@ class user
      * @param b 代理在user表中的ID;
      * @return Boolean false 失败
      */
-    public function isAfromB($a, $b)
+    public function isAfromB($child, $father)
     {
         $flag=false;
        
@@ -371,8 +375,6 @@ class user
             return $flag;
         }
 
-        $father=$b;
-        $child=$a;
         $continue=true;
         while ($continue) {
             $sql="SELECT agentAdmin,agentTop,agentDirect FROM user WHERE id='".$child."'";
@@ -412,9 +414,15 @@ class user
      * @return Boolean false 失败
      * @return Array  信息   成功
      */
-    public function showUserListByAgentID($agentID='')
+    public function showUserListByAgentID($userinfo=array())
     {
-        if ($agentID==='') {
+        foreach ($userinfo as $key => $value) {
+            $userinfo[$key] = trim($value); //去掉用户内容后面的空格.
+        }
+
+        if (array_key_exists("agentID", $userinfo)) { 
+            $agentID=$userinfo ["agentID"]; 
+        }else{
             return false;
         }
         $flag=false;
@@ -429,6 +437,16 @@ class user
         $sql="SELECT u.*,l.loginTime FROM user u LEFT JOIN (select aaaaaa.* from (select * from logLogin order by loginTime desc) aaaaaa group by aaaaaa.userID) l ON u.id=l.userID WHERE u.agentDirect='".$agentID."' ORDER BY l.loginTime DESC";
 
 
+        if (array_key_exists("n", $userinfo)) { 
+            $page=1;
+            if (array_key_exists("page", $userinfo)) { 
+                $page = $userinfo ["page"]; 
+            }
+            $n=$userinfo ["n"]; 
+            $m = ($page - 1) * $n;
+            $sql .= " limit $m, $n";
+
+        }
         $result = mysqli_query($conn, $sql);
 
         if ($result===false) {

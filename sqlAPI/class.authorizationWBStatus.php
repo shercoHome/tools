@@ -152,8 +152,15 @@ class authorizationWBStatus
 
         $sql.=" ORDER BY a.updateTime DESC";
 
-        if (array_key_exists('n', $info)) {
-            $sql.=" limit ".$info ['n'];
+        if (array_key_exists("n", $info)) { 
+            $page=1;
+            if (array_key_exists("page", $info)) { 
+                $page = $info ["page"]; 
+            }
+            $n=$info ["n"]; 
+            $m = ($page - 1) * $n;
+            $sql .= " limit $m, $n";
+
         }
 
         $flag=false;

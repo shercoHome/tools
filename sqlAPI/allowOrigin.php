@@ -7,6 +7,7 @@ $allow_origin = array(
     'http://192.168.0.117:8081',
     'http://www.beer668.cn',
     'http://duke.com:8080',
+    'http://duke.com:8081',
     'http://www.ezun666.cn'
 );
 $file_path=dirname(__FILE__).'/class.websetting.php';

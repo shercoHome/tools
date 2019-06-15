@@ -285,23 +285,29 @@ class webSetting
         }
         if (array_key_exists("userName", $userinfo)) { //用户账号
             $userName=$userinfo ["userName"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE a.userID=u.id AND u.userName='$userName' ORDER BY a.id DESC ";  
+            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE a.userID=u.id AND u.userName='$userName' ORDER BY a.userID";//ORDER BY a.id DESC ";  
         }
         if (array_key_exists("siteLink", $userinfo)) { //用户账号
             $this->siteLink=$userinfo ["siteLink"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE a.userID=u.id AND a.siteLink='$this->siteLink' ORDER BY a.id DESC ";  
+            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE a.userID=u.id AND a.siteLink LIKE '%$this->siteLink%' ORDER BY a.userID";//ORDER BY a.id DESC ";  
         }
         if (array_key_exists("userID", $userinfo)) { //用户账号
             $this->userID=$userinfo ["userID"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE  a.userID=u.id AND (a.userID='$this->userID' OR u.agentDirect='$this->userID')";  
+            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE  a.userID=u.id AND (a.userID='$this->userID' OR u.agentDirect='$this->userID')  ORDER BY a.userID";  
         }
         if (array_key_exists("id", $userinfo)) { //用户id
             $this->id=$userinfo ["id"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE  a.userID=u.id AND a.id='$this->id' ";
+            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE  a.userID=u.id AND a.id='$this->id'  ORDER BY a.userID";
         }
         if (array_key_exists("n", $userinfo)) { 
+            $page=1;
+            if (array_key_exists("page", $userinfo)) { 
+                $page = $userinfo ["page"]; 
+            }
             $n=$userinfo ["n"]; 
-            $sql.=" limit ".$n;
+            $m = ($page - 1) * $n;
+            $sql .= " limit $m, $n";
+
         }
         $result = mysqli_query($conn, $sql);
 
@@ -316,7 +322,7 @@ class webSetting
             }
             $flag= $arr;
         } else {
-            $flag=false;
+            $flag=array();
         }
 
         $conn->close();
@@ -333,8 +339,11 @@ class webSetting
         $info=$this->show(array("userID"=>$from));
         $infoOne=$info[0];
         array_shift($infoOne);
+        array_shift($infoOne);
         $infoOne["userID"]=$to;
-        if($this->show(array("userID"=>$to))===false){
+
+        $toIsExist=$this->show(array("userID"=>$to));
+        if($toIsExist==false){//空数组，或 false
             return $this->insert($infoOne);
         }else{
             return $this->update($infoOne);
