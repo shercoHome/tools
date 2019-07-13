@@ -1,24 +1,24 @@
-除非 Windows Activation Service (WAS)和万维网发布服务(W3SVC)均处于运行状态，否则无法启动网站
+## 无法启动网站
+### 除非 Windows Activation Service (WAS)和万维网发布服务(W3SVC)均处于运行状态，否则无法启动网站
 
 解决办法：
-在WINDOWS服务管理里 启动 World Wide Web Publishing Service 即可！
+* 在WINDOWS服务管理里 启动 World Wide Web Publishing Service 即可！
+    1. 打开WINDOWS服务管理方法：
+    2. 在运行内输入services.msc
+    3. 就可以打开服务
+    4. 找到windowsa installer
+    5. 右键——启动
+    6. 右键属性——启动类型——自动就可以了
 
-打开WINDOWS服务管理方法：
-在运行内输入services.msc
-就可以打开服务
-找到windowsa installer
-右键——启动
-右键属性——启动类型——自动就可以了
+### IIS提示“另一个程序正在使用此文件，进程无法访问。（异常来自HRESULT:0x80070020) ”
 
-IIS提示“另一个程序正在使用此文件，进程无法访问。（异常来自HRESULT:0x80070020) ”解决办法
+    问题原因
+    80或是443端口已被另一个程序占用
 
-80或是443端口已被另一个程序占用
-
-1、 打开CMD DOS模式窗口
-2、 在窗口中输入 netstat -obna 之后回车，在列出来的信息遂个查看443端口和80端口是否被占用
-
-
-记住使用80端口的pid号，在命令提示符下输入tasklist，用上边出现的pid号找到对应的程序，结束它
+解决办法
+1. 打开CMD DOS模式窗口
+2. 在窗口中输入 netstat -obna 之后回车，在列出来的信息遂个查看443端口和80端口是否被占用
+3. 记住使用80端口的pid号，在命令提示符下输入tasklist，用上边出现的pid号找到对应的程序，结束它
 
 401 - 未授权: 由于凭据无效，访问被拒绝。
 您无权使用所提供的凭据查看此目录或页面。
