@@ -20,34 +20,41 @@
 2. 在窗口中输入 netstat -obna 之后回车，在列出来的信息遂个查看443端口和80端口是否被占用
 3. 记住使用80端口的pid号，在命令提示符下输入tasklist，用上边出现的pid号找到对应的程序，结束它
 
-401 - 未授权: 由于凭据无效，访问被拒绝。
-您无权使用所提供的凭据查看此目录或页面。
+### 401 - 未授权: 由于凭据无效，访问被拒绝。
+
+    您无权使用所提供的凭据查看此目录或页面。
  
-
 解决方法：
+1. 打开“IIS信息服务管理器”——》选择你发布的网站——》选择功能视图中的“身份验证”——》右键匿名身份验证，选择“编辑”，选择“特定用户IUSR”；如果没有找到IUSR，就点击添加 输入 IUSR 密码为空。
+2. 右键要发布的网站文件夹，选择“安全”——》“编辑”——》“添加”——》“高级”——》“立刻查询”——》选择“IUSR”用户，然后保存；
 
-1、打开“IIS信息服务管理器”——》选择你发布的网站——》选择功能视图中的“身份验证”——》右键匿名身份验证，选择“编辑”，选择“特定用户IUSR”；如果没有找到IUSR，就点击添加 输入 IUSR 密码为空。
+### 401 - 未授权: 由于凭据无效，访问被拒绝。
 
-2、右键要发布的网站文件夹，选择“安全”——》“编辑”——》“添加”——》“高级”——》“立刻查询”——》选择“IUSR”用户，然后保存；
+### 服务器无法加载字体、app，显示404。
 
+文件后缀|MIME类型
+-----|-----|
+.plist|application/xml|
+.ipa|application/octet-stream|
+.apk|application/vnd.android.package-archive|
+.woff|application/x-font-woff|
 
+### 评论表的设计
 
-.plist  application/xml
-.ipa    application/octet-stream
-.apk    application/vnd.android.package-archive
-.woff   application/x-font-woff
+字段名称|字段说明
+-----|-----|
+id||
+fromQuestionID|question`s id|
+commentAuthor|user`s id|
+commentContent|string|
+commentCreatTime||
+underWhichCommentID| null or commentID|
+isDelete||
 
-id:
-fromQuestionID:question`s id
-commentAuthor:user`s id
-commentContent:string
-commentCreatTime
-underWhichCommentID: null or commentID
-isDelete
+    联表获取user信息，同question（underWhichCommentID==null）下（或同under）按时间顺序排序即可，即线性结构
+    如需点赞功能，另开一表（id、commentID、userID、type=like/hate、time）
 
-联表获取user信息，同question（underWhichCommentID==null）下（或同under）按时间顺序排序即可，即线性结构
-如需点赞功能，另开一表（id、commentID、userID、type=like/hate、time）
-
-SQL
-追加
+### SQL 追加
+```sql
 UPDATE test SET user= CONCAT(user,',phpchina')  WHERE id= '2';
+```
