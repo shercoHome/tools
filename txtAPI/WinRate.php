@@ -13,7 +13,6 @@ date_default_timezone_set("Asia/Chongqing");
 // private $authorize_msg;      授权提示信息
 class WinRate
 {
-    
     private $n_qi_plan;
     private $plan_id;
     private $plan_ways;
@@ -48,7 +47,6 @@ class WinRate
             if (gettype($value)=="string") {
                 $info[$key] = trim($value); //去掉用户内容后面的空格.
             }
-            
         }
         if (array_key_exists('api', $info)) {
             $this->api=$info ['api'];
@@ -84,18 +82,18 @@ class WinRate
 
         $mk_day=date("Ymd");
         ////开奖时间，13:09~~ 次日 04：04
-        if($this->api=="lucky-air-ship"){
+        if ($this->api=="lucky-air-ship") {
             $nowtime=date("Y-m-d H:i:s");
             $firstTime=date("Y-m-d")." 04:09:00";
-            if(strtotime($nowtime)<strtotime($firstTime)){
+            if (strtotime($nowtime)<strtotime($firstTime)) {
                 $mk_day=date("Ymd", strtotime("-1 day"));
             }
         }
         ////开奖时间，09:00~~ 次日 00：00
-        if($this->api=="pc28"){
+        if ($this->api=="pc28") {
             $nowtime=date("Y-m-d H:i:s");
             $firstTime=date("Y-m-d")." 00:05:00";
-            if(strtotime($nowtime)<strtotime($firstTime)){
+            if (strtotime($nowtime)<strtotime($firstTime)) {
                 $mk_day=date("Ymd", strtotime("-1 day"));
             }
         }
@@ -104,7 +102,9 @@ class WinRate
         $this->kj_dir=$this->api."/txt-kj/".$mk_day;
 
 
-        $this->kj_history=$this->get_today_kj();
+        if (strpos($this->api,'||')===false) {
+            $this->kj_history=$this->get_today_kj();
+        }
     }
     public function getAllRate($show_one_plan_by_id=-1)
     {
@@ -116,12 +116,12 @@ class WinRate
             $___countWin=$kj_result['countWin'];
             // $___plan='sizeLimit';
             // if($show_one_plan_by_id==$i){
-                $___plan=$kj_result['plan'];
+            $___plan=$kj_result['plan'];
             // }
             array_push($win_rate_s, array("id"=>$i,"rate"=>$___kj_rate,"countWin"=>$___countWin,"plan"=>$___plan));
         }
         //数组按 其内的二维数组的key排序
-        array_multisort (array_column($win_rate_s, 'rate'), SORT_DESC, $win_rate_s);
+        array_multisort(array_column($win_rate_s, 'rate'), SORT_DESC, $win_rate_s);
 
         $needA_start=$this->needAuthorize_array[0];
         $needA_start=$needA_start>0?($needA_start-1):0;
@@ -130,14 +130,14 @@ class WinRate
         $defaultPlanId_index=$this->defaultPlanId_index;
         $defaultID=0;//没有记录
       
-        if(isset($_SESSION['token'])){
+        if (isset($_SESSION['token'])) {
             $token=$_SESSION["token"];
-            if(isset($_SESSION[$token])){
+            if (isset($_SESSION[$token])) {
                 $defaultID=$_SESSION[$token];
-            }else{
+            } else {
                 $defaultPlanId_index--;
                 for ($i=0;$i<50;$i++) {
-                    if($i==$defaultPlanId_index){
+                    if ($i==$defaultPlanId_index) {
                         $defaultID= $win_rate_s[$i]["id"];
                         $_SESSION[$token]=$defaultID;
                         break;
@@ -145,20 +145,20 @@ class WinRate
                 }
             }
         }
-        if($show_one_plan_by_id==0){
+        if ($show_one_plan_by_id==0) {
             $show_one_plan_by_id=$defaultID;
         }
         for ($ii=0;$ii<50;$ii++) {
-            if($win_rate_s[$ii]["id"]==$show_one_plan_by_id ){//显示的plan
+            if ($win_rate_s[$ii]["id"]==$show_one_plan_by_id) {//显示的plan
                 if ($this->authorizeMark=="0") { //未授权
                     if ($ii>=$needA_start && $ii<$needA_end) {//前n个计划  不可见
                         //前n个计划  不可见//前n个计划  不可见//前n个计划  不可见
-                            if($defaultID!=$show_one_plan_by_id){ //默认计划除外
+                            if ($defaultID!=$show_one_plan_by_id) { //默认计划除外
                                 $win_rate_s[$ii]["plan"][0]["planOne"]=$this->authorize_msg; //不可见
                             }
                     }
                 }
-            }else{
+            } else {
                 $win_rate_s[$ii]["plan"]="sizeLimit";//不输出此计划
             }
         }
@@ -167,7 +167,6 @@ class WinRate
 
     public function getOneRate()
     {
-        
         $api_=$this->api;
         $plan__id=$this->plan_id;
         $plan_ways=$this->plan_ways;
@@ -182,7 +181,7 @@ class WinRate
 
         $authorize_msg=$this->authorize_msg;
     
-        if($plan__id==-1){
+        if ($plan__id==-1) {
             return json_encode(array("plan"=>'no id',"rate"=>0));
         }
 
@@ -237,7 +236,7 @@ class WinRate
     
             ///////////////// 开奖号码 ///////////////
             $kj_q=$kj_q."";
-            if (!array_key_exists($kj_q,$kj_a)){
+            if (!array_key_exists($kj_q, $kj_a)) {
                 continue;
             }
             //  var_dump($kj_q);
@@ -247,7 +246,7 @@ class WinRate
             $kj_code_ar=explode(',', $kj_code_ar);
             //$kj_code_one=$kj_code_ar[$plan__positon]+0;
             //$kj_code_one=($kj_code_one==10)?"0":($kj_code_one."");
-            $kj_code_one=$kj_code_ar[$plan__positon];  
+            $kj_code_one=$kj_code_ar[$plan__positon];
             ///////////////  判断中奖  //////////////
             //$r=strpos($plan_one, $kj_code_one);//函数查找kj_code_one字符串在另一字符串plan_one中第一次出现的位置。
     
@@ -286,10 +285,10 @@ class WinRate
                     $kj_code="-1";
                     $kj_code_one="等";
                     $result="等";
-                }else{
-                    if($result==1){
+                } else {
+                    if ($result==1) {
                         $countWin++;
-                    }else{
+                    } else {
                         $countWin=0;
                     }
                 }
@@ -321,7 +320,7 @@ class WinRate
         }
         if ($p_r_c>$latest__limit) {
             //$plan_result_limit = array_slice($plan_result, -1*$latest__limit, $latest__limit, false);
-            $plan_result_limit = array_slice($plan_result,0, $latest__limit, false);//2019-03-10 13:00:21修改，倒序输出
+            $plan_result_limit = array_slice($plan_result, 0, $latest__limit, false);//2019-03-10 13:00:21修改，倒序输出
         } else {
             $plan_result_limit=$plan_result;
         }
@@ -355,7 +354,7 @@ class WinRate
             // }
 
 
-        //array_push(
+            //array_push(
         array_unshift(//2019-03-10 13:00:21修改，倒序输出
             $plan_result_limit,
             array(
@@ -376,11 +375,12 @@ class WinRate
         //krsort($plan_result_limit);
         return array("plan"=>$plan_result_limit,"rate"=>$win_rate,"countWin"=>$countWin);
     }
-    private function get_today_kj()
+    public function get_today_kj($dir="")
     {
 
-
-        $dir=$this->kj_dir;
+        if ($dir=="") {
+            $dir=$this->kj_dir;
+        }
         $handler = opendir($dir);
         // 2、循环的读取目录下的所有文件
         /*
@@ -397,9 +397,11 @@ class WinRate
                 // array_push($txt_filename_qihao, $filename);//尾部添加  0,726528~32,726560
                 //array_unshift($txt_filename_qihao,$filename);//头部添加元素
                 $kj= $this->get_file_content($dir."/".$filename);
-                if($kj==''){continue;}
+                if ($kj=='') {
+                    continue;
+                }
                 $kj_json=json_decode($kj);
-                if(property_exists($kj_json, "data")){
+                if (property_exists($kj_json, "data")) {
                     $key=$kj_json->data[0]->expect;
                     $val=$kj_json->data[0]->opencode;
                     $kj_qihao_value[$key]=$val;
@@ -418,9 +420,8 @@ class WinRate
         fclose($myfile);
         return $content_;
     }
-    private function checkResult($plan,$kj)
+    private function checkResult($plan, $kj)
     {
-    
         $flag=false;
         if (mb_strpos($kj, "||", 0, "utf-8")!==false) {//或
             //函数查找 || 字符串在另一字符串$kj中第一次出现的位置。
@@ -435,7 +436,7 @@ class WinRate
                     break;
                 }
             }
-        }elseif(mb_strpos($kj, "&&", 0, "utf-8")!==false){//且
+        } elseif (mb_strpos($kj, "&&", 0, "utf-8")!==false) {//且
             $kj_arr=explode("&&", $kj);
             $kj_arr_count=count($kj_arr);
             $mark=0;
@@ -448,8 +449,8 @@ class WinRate
             if ($mark==$kj_arr_count) {
                 $flag=true;
             };
-        }else{
-            if(mb_strpos($plan, $kj, 0, "utf-8")!==false){
+        } else {
+            if (mb_strpos($plan, $kj, 0, "utf-8")!==false) {
                 $flag=true;
             };
         }

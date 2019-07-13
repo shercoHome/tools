@@ -10,6 +10,7 @@ $webID='';
 $shareCode='';
 $username='';
 $password='';
+$newpassword='';
 $registerQQ='';
 $registerWechat='';
 $registerPhone='';
@@ -17,6 +18,27 @@ $registerEmail='';
 $fromLink='';
 $formKey='';
 $formValue='';
+
+if (is_array($_GET)&&count($_GET)>0) {
+    $file_path=dirname(__FILE__).'/class.websetting.php';
+    try {
+        if (file_exists($file_path)) {
+            $getid='1';
+            if (isset($_GET["userID"])) {
+                if (strlen($_GET["userID"])>0) {
+                    $getid=$_GET['userID'];
+                }
+            }
+            require_once $file_path;
+            $DBwebsetting=new websetting();
+            $webInfo=array('userID'=>$getid);
+            $arLink=$DBwebsetting->show($webInfo);
+            echo $arLink[0]['siteLink'];   
+        } else {
+        }
+    } catch (Exception $e) {
+    }
+}
 if (is_array($_POST)&&count($_POST)>0) {
     if (isset($_POST["aff"])) {
         if (strlen($_POST["aff"])>0) {
@@ -51,6 +73,11 @@ if (is_array($_POST)&&count($_POST)>0) {
     if (isset($_POST["password"])) {
         if (strlen($_POST["password"])>0) {
             $password=$_POST["password"];
+        }
+    }
+    if (isset($_POST["newpassword"])) {
+        if (strlen($_POST["newpassword"])>0) {
+            $newpassword=$_POST["newpassword"];
         }
     }
     if (isset($_POST["registerQQ"])) {
@@ -92,6 +119,9 @@ if (is_array($_POST)&&count($_POST)>0) {
     if (isset($_POST["type"])) {
         if (strlen($_POST["type"])>0) {
             switch ($_POST["type"]) {
+                case 'changePassword':
+                echo json_encode(changePassword($userID, $token, $password, $newpassword));
+                break;
                 case 'updateUser':
                     echo json_encode(updateUser($userID, $token, $formKey, $formValue));
                     break;
@@ -145,6 +175,39 @@ function webInt($aff, $userID, $token, $shareCode)
     $re_arr['shareCode']=($shareCode!=="")?addShare($shareCode):$re_err;
     return $re_arr;
 }
+
+
+function changePassword($userID, $token, $password, $newpassword)
+{
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>updateUser","data"=>$isLogin);
+    }
+
+    require_once 'class.user.php';
+    $DBuser=new user();
+    $userInfos=$DBuser->show(array("id"=>$userID));
+    $userInfo=$userInfos[0];
+    $oldpassword=$userInfo['userPsw'];
+    $oldpassword_temp=$DBuser->createPassWord($password);
+    if ($oldpassword!==$oldpassword_temp) {
+        return array("code"=>"0","msg"=>"旧密码错误","data"=>$oldpassword_temp);
+    }
+
+    $updateInfo=array("id"=>$userID,"userPsw"=>$newpassword);
+    
+    $re_update=$DBuser->update($updateInfo);
+    if ($re_update===true) {
+        return array("code"=>"1","msg"=>"修改成功<br>changePassword: successfully","data"=>$re_update);
+    } else {
+        return array("code"=>"0","msg"=>"修改出错<br>changePassword: false","data"=>$re_update);
+    }
+
+
+}
+
 function updateUser($userID, $token, $formKey, $formValue)
 {
     require_once 'class.logLogin.php';
@@ -329,35 +392,58 @@ function reLogin($userID, $token)
             $webInfo=array("userID"=>$hisAgentID);
             $json_set=$DBwebsetting->show($webInfo)[0];
             $hisShareRequiredIP=$json_set['shareRequiredIP'];
-            $hisLimite=$json_set['shareLimiteTime'];
+            $hisLimite=$json_set['shareLimiteTime'];//授权持续的时间 分享授权|荣誉授权  0永久，n 天
+            $hisLimite_array=explode("|",$hisLimite);
+            $hisLimite_share=array_key_exists(0,$hisLimite_array)?$hisLimite_array[0]:"10";//分享授权持续时间
+            $hisLimite_white=array_key_exists(1,$hisLimite_array)?$hisLimite_array[1]:"30";//荣誉授权持续时间
             $hisStatus=$userInfo['authorizationStatus'];
             $hisTime=$userInfo['authorizationTime'];
-            
-            if ($hisStatus =="0" || $hisStatus=="2") {//待授权未处理，先覆盖
+
+            //hisStatus	授权状态（0未 1已 2待 3特别   //未授权0	已授权1	黑名单2	特别授权3 2019年6月15日 15:33:13 修改状态2 为黑名单
+            //hisTime 开始授权的时间，变更授权状态时修改
+
+
+            $new_hisStatus=$hisStatus;
+
+            if ($hisStatus =="0") {//未授权处理
                 if ($shareCount>=$hisShareRequiredIP) {//对比授权要求
                     //授权有变，更正授权状态
                     $userInfo['authorizationStatus']="1";
-                    $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
+                    $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
+                    if($__update){
+                        $new_hisStatus="1";
+                    }
                 }
-            } elseif ($hisStatus=="1") {
+            } elseif ($hisStatus=="1") {  //已授权1  
                 $t1= strtotime($hisTime);
-                $t2=strtotime("-".$hisLimite." days");
-                if ($t1<$t2 && $hisLimite!="0") {//到期
+                $t2=strtotime("-".$hisLimite_share." days");
+                if ($t1<$t2 && $hisLimite_share!="0") {//到期
                     $userInfo['authorizationStatus']="0";
-                    $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    if($__update){
+                        $new_hisStatus="0";
+                    }
+
                     $expired=$DBshare->expired($shareCode);
                 }
                 if ($shareCount<$hisShareRequiredIP) {//对比授权要求
                     //授权有变，更正授权状态
                     $userInfo['authorizationStatus']="0";
-                    $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    if($__update){
+                        $new_hisStatus="0";
+                    }
                 }
-            } else {
+            } elseif ($hisStatus=="3" ) {  //  特别授权3 
                 $t1= strtotime($hisTime);
-                $t2=strtotime("-".$hisLimite." days");
-                if ($t1<$t2 && $hisLimite!="0") {//到期
+                $t2=strtotime("-".$hisLimite_white." days");
+            
+                if ($t1<$t2 && $hisLimite_white!="0") {//到期
                     $userInfo['authorizationStatus']="0";
-                    $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    if($__update){
+                        $new_hisStatus="0";
+                    }
                     $expired=$DBshare->expired($shareCode);
 
                     $info=array(
@@ -365,19 +451,77 @@ function reLogin($userID, $token)
                         "wbStatus"=>'0',
                         "updater"=>$userInfo['id']
                         );
-                    require_once 'class.authorizationWBStatus.php';
-                    $authorizationWBStatus=new authorizationWBStatus();
+
+                        require_once 'class.authorizationWBStatus.php';
+                        $authorizationWBStatus=new authorizationWBStatus();
+                    //  $re_authorizationWBStatus=$authorizationWBStatus->show(array("id"=>$userID));//特别授权表中的数据
+                    //  $hisWBStatue=$re_authorizationWBStatus[0]['wbStatus']; //白名单1	黑名单2 不在名单0
                     $re_insert=$authorizationWBStatus->insert($info);
                 }
+            } else {//黑名单
+                $new_hisStatus="2";
             }
-            //////////////////////////////////
-            // if ($userInfo['agentDirect']=="0") {
-            //     $userInfo['aff']= "http://".$json_set['siteLink'];
+            // if ($hisStatus =="0" || $hisStatus=="2") {//待授权未处理，先覆盖
+            //     if ($shareCount>=$hisShareRequiredIP) {//对比授权要求
+            //         //授权有变，更正授权状态
+            //         $userInfo['authorizationStatus']="1";
+            //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
+            //     }
+            // } elseif ($hisStatus=="1") {
+            //     $t1= strtotime($hisTime);
+            //     $t2=strtotime("-".$hisLimite." days");
+            //     if ($t1<$t2 && $hisLimite!="0") {//到期
+            //         $userInfo['authorizationStatus']="0";
+            //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+            //         $expired=$DBshare->expired($shareCode);
+            //     }
+            //     if ($shareCount<$hisShareRequiredIP) {//对比授权要求
+            //         //授权有变，更正授权状态
+            //         $userInfo['authorizationStatus']="0";
+            //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+            //     }
             // } else {
-            //     $webInfo2=array("userID"=>$userInfo['agentDirect']);
-            //     $json_set2=$DBwebsetting->show($webInfo2)[0];
-            //     $userInfo['aff']= "http://".$json_set2['siteLink'];
+            //     $t1= strtotime($hisTime);
+            //     $t2=strtotime("-".$hisLimite." days");
+            //     if ($t1<$t2 && $hisLimite!="0") {//到期
+            //         $userInfo['authorizationStatus']="0";
+            //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+            //         $expired=$DBshare->expired($shareCode);
+
+            //         $info=array(
+            //             "userID"=>$userInfo['id'],
+            //             "wbStatus"=>'0',
+            //             "updater"=>$userInfo['id']
+            //             );
+            //         require_once 'class.authorizationWBStatus.php';
+            //         $authorizationWBStatus=new authorizationWBStatus();
+            //         $re_insert=$authorizationWBStatus->insert($info);
+            //     }
             // }
+            //////////////////////////////////
+
+
+            $userInfo['authorizationStatus']=$new_hisStatus;
+
+
+
+            if($hisStatus!==$new_hisStatus){
+                //加入登录日志
+                require_once 'class.logLogin.php';
+                $DBlog=new logLogin();
+                $loginToken=$DBlog->createToken($userID, $loginWeb_ID, $loginkeep, $new_hisStatus);
+            // $DBlogInsert=$DBlog->insert($userInfo['id'], $aff, $fromLink);
+            // if ($DBlogInsert===true) {
+                    //
+            // };
+                $userInfo['loginToken']=$loginToken;
+            }
+
+
+            
+
+
+
             $userInfo['aff']= "http://".$json_set['siteLink'];
             $userInfo['shareCount']=$shareCount;
             $userInfo['shareRequiredIP']=$json_set['shareRequiredIP'];
@@ -432,15 +576,7 @@ function userLogin($name, $psw, $aff, $fromLink)
                 $loginWebMasterID=$json_set['userID'];
                 $loginkeep=$json_set['loginKeep'];
                 //$loginOutTime=date('Y-m-d H:i:s', strtotime("+".$loginkeep." minutes"));//过期时间
-                //加入登录日志
-                require_once 'class.logLogin.php';
-                $DBlog=new logLogin();
-                $loginToken=$DBlog->createToken($userID, $loginWeb_ID, $loginkeep, $authorizationStatus);
-                $DBlogInsert=$DBlog->insert($userInfo['id'], $aff, $fromLink);
-                if ($DBlogInsert===true) {
-                    //
-                };
-                $userInfo['loginToken']=$loginToken;
+
 
                 
                 //刷新授权
@@ -470,63 +606,116 @@ function userLogin($name, $psw, $aff, $fromLink)
                     $webInfo=array("userID"=>$hisAgentID);
                     $json_set=$DBwebsetting->show($webInfo)[0];
                     $hisShareRequiredIP=$json_set['shareRequiredIP'];
-                    $hisLimite=$json_set['shareLimiteTime'];
+                    $hisLimite=$json_set['shareLimiteTime'];//授权持续的时间 分享授权|荣誉授权  0永久，n 天
+                    $hisLimite_array=explode("|",$hisLimite);
+                    $hisLimite_share=array_key_exists(0,$hisLimite_array)?$hisLimite_array[0]:"10";//分享授权持续时间
+                    $hisLimite_white=array_key_exists(1,$hisLimite_array)?$hisLimite_array[1]:"30";//荣誉授权持续时间
                     $hisStatus=$userInfo['authorizationStatus'];
                     $hisTime=$userInfo['authorizationTime'];
-                    if ($hisStatus =="0" || $hisStatus=="2") {//待授权未处理，先覆盖
+        
+                    //hisStatus	授权状态（0未 1已 2待 3特别   //未授权0	已授权1	黑名单2	特别授权3 2019年6月15日 15:33:13 修改状态2 为黑名单
+                    //hisTime 开始授权的时间，变更授权状态时修改
+                    
+
+                    $new_hisStatus=$hisStatus;
+
+                    if ($hisStatus =="0") {//未授权处理
                         if ($shareCount>=$hisShareRequiredIP) {//对比授权要求
                             //授权有变，更正授权状态
                             $userInfo['authorizationStatus']="1";
-                            $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
+                            $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
+                            if($__update){
+                                $new_hisStatus="1";
+                            }
                         }
-                    } elseif ($hisStatus=="1") {
+                    } elseif ($hisStatus=="1") {  //已分享授权1  
                         $t1= strtotime($hisTime);
-                        $t2=strtotime("-".$hisLimite." days");
-                        if ($t1<$t2 && $hisLimite!="0") {//到期
+                        $t2=strtotime("-".$hisLimite_share." days");
+                        if ($t1<$t2 && $hisLimite_share!="0") {//到期
                             $userInfo['authorizationStatus']="0";
-                            $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                            $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                            if($__update){
+                                $new_hisStatus="0";
+                            }
+
                             $expired=$DBshare->expired($shareCode);
                         }
                         if ($shareCount<$hisShareRequiredIP) {//对比授权要求
                             //授权有变，更正授权状态
                             $userInfo['authorizationStatus']="0";
-                            $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                            $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                            if($__update){
+                                $new_hisStatus="0";
+                            }
                         }
-                    } else {
+                    } elseif ($hisStatus=="3" ) {  //  特别授权3 
                         $t1= strtotime($hisTime);
-                        $t2=strtotime("-".$hisLimite." days");
-                        if ($t1<$t2 && $hisLimite!="0") {//到期
+                        $t2=strtotime("-".$hisLimite_white." days");
+                     
+                        if ($t1<$t2 && $hisLimite_white!="0") {//到期
                             $userInfo['authorizationStatus']="0";
-                            $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                            $__update=$DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                            if($__update){
+                                $new_hisStatus="0";
+                            }
                             $expired=$DBshare->expired($shareCode);
-        
+
                             $info=array(
                                 "userID"=>$userInfo['id'],
                                 "wbStatus"=>'0',
                                 "updater"=>$userInfo['id']
                                 );
-                            require_once 'class.authorizationWBStatus.php';
-                            $authorizationWBStatus=new authorizationWBStatus();
+
+                                require_once 'class.authorizationWBStatus.php';
+                                $authorizationWBStatus=new authorizationWBStatus();
+                              //  $re_authorizationWBStatus=$authorizationWBStatus->show(array("id"=>$userID));//特别授权表中的数据
+                              //  $hisWBStatue=$re_authorizationWBStatus[0]['wbStatus']; //白名单1	黑名单2 不在名单0
                             $re_insert=$authorizationWBStatus->insert($info);
                         }
+                    } else {//黑名单
+                        $new_hisStatus="2";
                     }
-                    //////////////////////////////////
-                    // if ($userInfo['agentDirect']=="0") {
-                    //     $userInfo['aff']= "http://".$aff;
-                    // } else{
-                    //     if($userInfo['agentStatus']=="1"){
-
-                    //         $webInfo2=array("userID"=>$userInfo['id']);
-                    //         $json_set2=$DBwebsetting->show($webInfo2)[0];
-                    //         $userInfo['aff']= "http://".$json_set2['siteLink'];
-
-                    //     }else{
-                    //         $webInfo2=array("userID"=>$userInfo['agentDirect']);
-                    //         $json_set2=$DBwebsetting->show($webInfo2)[0];
-                    //         $userInfo['aff']= "http://".$json_set2['siteLink'];
+                    
+///////////////////////////////
+                    // if ($hisStatus =="0" || $hisStatus=="2") {//待授权未处理，先覆盖
+                    //     if ($shareCount>=$hisShareRequiredIP) {//对比授权要求
+                    //         //授权有变，更正授权状态
+                    //         $userInfo['authorizationStatus']="1";
+                    //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'1'));
                     //     }
-
+                    // } elseif ($hisStatus=="1") {
+                    //     $t1= strtotime($hisTime);
+                    //     $t2=strtotime("-".$hisLimite." days");
+                    //     if ($t1<$t2 && $hisLimite!="0") {//到期
+                    //         $userInfo['authorizationStatus']="0";
+                    //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    //         $expired=$DBshare->expired($shareCode);
+                    //     }
+                    //     if ($shareCount<$hisShareRequiredIP) {//对比授权要求
+                    //         //授权有变，更正授权状态
+                    //         $userInfo['authorizationStatus']="0";
+                    //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    //     }
+                    // } else {
+                    //     $t1= strtotime($hisTime);
+                    //     $t2=strtotime("-".$hisLimite." days");
+                    //     if ($t1<$t2 && $hisLimite!="0") {//到期
+                    //         $userInfo['authorizationStatus']="0";
+                    //         $DBuser->update(array("id"=>$userInfo['id'],'authorizationStatus'=>'0'));
+                    //         $expired=$DBshare->expired($shareCode);
+        
+                    //         $info=array(
+                    //             "userID"=>$userInfo['id'],
+                    //             "wbStatus"=>'0',
+                    //             "updater"=>$userInfo['id']
+                    //             );
+                    //         require_once 'class.authorizationWBStatus.php';
+                    //         $authorizationWBStatus=new authorizationWBStatus();
+                    //         $re_insert=$authorizationWBStatus->insert($info);
+                    //     }
                     // }
+                    //////////////////////////////////
+
                     $userInfo['aff']= "http://".$json_set['siteLink'];
                     $userInfo['shareCount']=$shareCount;
                     $userInfo['shareRequiredIP']=$json_set['shareRequiredIP'];
@@ -535,6 +724,18 @@ function userLogin($name, $psw, $aff, $fromLink)
 
                     $userInfo['checkShareCode']=$checkShareCode;
                 }
+
+                $userInfo['authorizationStatus']=$new_hisStatus;
+
+                //加入登录日志
+                require_once 'class.logLogin.php';
+                $DBlog=new logLogin();
+                $loginToken=$DBlog->createToken($userID, $loginWeb_ID, $loginkeep, $new_hisStatus);
+                $DBlogInsert=$DBlog->insert($userInfo['id'], $aff, $fromLink);
+                if ($DBlogInsert===true) {
+                    //
+                };
+                $userInfo['loginToken']=$loginToken;
                 
 
                 //0-id 1-user 2-psw 3-time 4-ip 5-code 6-userAuthorize
@@ -579,6 +780,10 @@ function checkUser($name)
  */
 function userRegister($name, $psw, $aff, $fromLink, $registerQQ, $registerWechat, $registerPhone, $registerEmail)
 {
+
+    //维护中，无法注册，便于搬家
+   // return array("code"=>"0","msg"=>"注册失败，系统维护中，请22:00后再试","data"=>array());
+
     if (!isMatchName($name)) {
         $json_result=array("code"=>"-1","msg"=>"账号为6-15位英文字母、数字或下划线（字母开头）","data"=>array());
     } elseif (!isMatchPSw($psw)) {

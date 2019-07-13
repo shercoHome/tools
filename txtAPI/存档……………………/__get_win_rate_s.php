@@ -1,5 +1,8 @@
 ﻿<?php
-require '../sqlAPI/allowOrigin.php';
+//require '../sqlAPI/allowOrigin.php';
+
+$fileTempMK="../api_admin_sql/";
+require $fileTempMK.'allowOrigin.php';
 
 $api="pk10";//哪个文件夹
 $plan_positon=0;

@@ -229,6 +229,27 @@ class user
         if ($result=== true) {
             $this->id=mysqli_insert_id($conn);
             $flag=$this->id;
+
+            //将资料备份到 userInfoUpdateLog 表  开始
+            if (array_key_exists('userQQ', $userinfo)||array_key_exists('userWechat', $userinfo)||array_key_exists('userPhone', $userinfo)||array_key_exists('userEmail', $userinfo)) {
+                require_once 'class.userInfoUpdateLog.php';
+                $this->userInfoUpdateLog=new userInfoUpdateLog();
+                if($this->userQQ!="isNull"){
+                    $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userQQ',"infoValue"=>$this->userQQ));
+                }
+                if($this->userWechat!="isNull"){
+                    $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userWechat',"infoValue"=>$this->userWechat));
+                }
+                if($this->userPhone!="isNull"){
+                    $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userPhone',"infoValue"=>$this->userPhone));
+                }
+                if($this->userEmail!="isNull"){
+                    $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userEmail',"infoValue"=>$this->userEmail));
+                }  
+            }
+            //将资料备份到 userInfoUpdateLog 表  结束
+
+
         } else {
             die("INSERT_Error: " . $sql . "<br>" . $conn->error);
             return $flag;
@@ -263,9 +284,9 @@ class user
             return $flag;
         }
 
-        $sql="SELECT u.*,l.loginTime FROM user u LEFT JOIN (select aaaaaa.* from (select * from logLogin order by loginTime desc) aaaaaa group by aaaaaa.userID) l ON u.id=l.userID ";
+        $sql="SELECT u.*,l.loginTime,agent.userName AS agentName FROM user agent, user u LEFT JOIN (select aaaaaa.* from (select * from logLogin order by loginTime desc) aaaaaa group by aaaaaa.userID) l ON u.id=l.userID ";
 
-        $sql.=" WHERE 1 ";
+        $sql.=" WHERE 1 AND u.agentDirect = agent.id ";
 
         if (array_key_exists("userName", $userinfo)) { //用户账号
             $this->userName=$userinfo ["userName"];
@@ -294,12 +315,18 @@ class user
         if (array_key_exists("authorizationStatus", $userinfo)) { //用户id
             $this->authorizationStatus=$userinfo ["authorizationStatus"];
             $sql.=" AND u.authorizationStatus='$this->authorizationStatus'";
-
-
-   
         }
 
         //$sql.=" ORDER BY l.loginTime DESC";
+        if (array_key_exists("sort", $userinfo)) {
+            $sort = $userinfo ["sort"]; 
+            if($sort=="1"){$sql.=" ORDER BY l.loginTime DESC";}// <el-option label="登录倒序" value="1"></el-option>
+            if($sort=="2"){$sql.=" ORDER BY l.loginTime";}// <el-option label="登录顺序" value="2"></el-option>
+            if($sort=="3"){$sql.=" ORDER BY u.registerTime DESC";}// <el-option label="注册倒序" value="3"></el-option>
+            if($sort=="4"){$sql.=" ORDER BY u.registerTime";}// <el-option label="注册顺序" value="4"></el-option>
+            if($sort=="5"){$sql.=" ORDER BY u.authorizationTime DESC";}// <el-option label="授权倒序" value="5"></el-option>
+            if($sort=="6"){$sql.=" ORDER BY u.authorizationTime";}// <el-option label="授权顺序" value="6"></el-option>
+        }
 
         if (array_key_exists("n", $userinfo)) { 
             $page=1;
@@ -309,7 +336,6 @@ class user
             $n=$userinfo ["n"]; 
             $m = ($page - 1) * $n;
             $sql .= " limit $m, $n";
-
         }
 
         $result = mysqli_query($conn, $sql);
@@ -434,8 +460,27 @@ class user
             return $flag;
         }
 
-        $sql="SELECT u.*,l.loginTime FROM user u LEFT JOIN (select aaaaaa.* from (select * from logLogin order by loginTime desc) aaaaaa group by aaaaaa.userID) l ON u.id=l.userID WHERE u.agentDirect='".$agentID."' ORDER BY l.loginTime DESC";
+       // $sql="SELECT u.*,l.loginTime FROM user u LEFT JOIN (select aaaaaa.* from (select * from logLogin order by loginTime desc) aaaaaa group by aaaaaa.userID) l ON u.id=l.userID WHERE u.agentDirect='".$agentID."'";
+       //2019年6月29日 10:53:46 增加显示代理的账号
+        $sql="SELECT u.*,l.loginTime,agent.userName AS agentName FROM user agent, user u LEFT JOIN (select aaaaaa.* from (select * from logLogin order by loginTime desc) aaaaaa group by aaaaaa.userID) l ON u.id=l.userID WHERE u.agentDirect = agent.id AND u.agentDirect='".$agentID."'";
 
+       
+
+        if (array_key_exists("sort", $userinfo)) {
+                $sort = $userinfo ["sort"]; 
+                
+                if($sort=="1"){$sql.=" ORDER BY l.loginTime DESC";}// <el-option label="登录倒序" value="1"></el-option>
+                if($sort=="2"){$sql.=" ORDER BY l.loginTime";}// <el-option label="登录顺序" value="2"></el-option>
+                if($sort=="3"){$sql.=" ORDER BY u.registerTime DESC";}// <el-option label="注册倒序" value="3"></el-option>
+                if($sort=="4"){$sql.=" ORDER BY u.registerTime";}// <el-option label="注册顺序" value="4"></el-option>
+                if($sort=="5"){$sql.=" ORDER BY u.authorizationTime DESC";}// <el-option label="授权倒序" value="5"></el-option>
+                if($sort=="6"){$sql.=" ORDER BY u.authorizationTime";}// <el-option label="授权顺序" value="6"></el-option>
+
+        }else{
+            $sql.=" ORDER BY l.loginTime DESC";
+        }
+
+        
 
         if (array_key_exists("n", $userinfo)) { 
             $page=1;
@@ -554,6 +599,38 @@ class user
             return $flag;
         }
         $flag = mysqli_query($conn, $sql);
+
+        //将资料备份到 userInfoUpdateLog 表  开始
+
+        if (array_key_exists('userQQ', $userinfo)) {
+            $this->userQQ=$userinfo ['userQQ'];
+        }
+        if (array_key_exists('userWechat', $userinfo)) {
+            $this->userWechat=$userinfo ['userWechat'];
+        }
+        if (array_key_exists('userPhone', $userinfo)) {
+            $this->userPhone=$userinfo ['userPhone'];
+        }
+        if (array_key_exists('userEmail', $userinfo)) {
+            $this->userEmail=$userinfo ['userEmail'];
+        }
+        if (array_key_exists('userQQ', $userinfo)||array_key_exists('userWechat', $userinfo)||array_key_exists('userPhone', $userinfo)||array_key_exists('userEmail', $userinfo)) {
+            require_once 'class.userInfoUpdateLog.php';
+            $this->userInfoUpdateLog=new userInfoUpdateLog();
+            if($this->userQQ!="isNull"){
+                $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userQQ',"infoValue"=>$this->userQQ));
+            }
+            if($this->userWechat!="isNull"){
+                $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userWechat',"infoValue"=>$this->userWechat));
+            }
+            if($this->userPhone!="isNull"){
+                $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userPhone',"infoValue"=>$this->userPhone));
+            }
+            if($this->userEmail!="isNull"){
+                $this->userInfoUpdateLog->insert(array("userID"=>$this->id,"infoType"=>'userEmail',"infoValue"=>$this->userEmail));
+            }  
+        }
+        //将资料备份到 userInfoUpdateLog 表  结束
 
         $conn->close();
         return $flag;

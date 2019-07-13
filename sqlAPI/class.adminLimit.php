@@ -3,7 +3,7 @@ date_default_timezone_set("Asia/Chongqing");
 // id	唯一标识	0				自增，唯一
 // userID	账号标识	0				来自user表
 // webSetting_siteLink	可否修改本站的链接	0	0	0	1	
-// webSetting_siteName	可否修改本站的名称	0	0	1	1	
+// webSetting_siteConfig	可否修改本站的基本设置	0	0	1	1	
 // webSetting_publicAuthorization	可否开关自己网站的授权	0	0	0	1	
 // webSetting_shareRequiredIP	可否修改自己分享IP数要求	0	0	0	1	
 // webSetting_shareRequiredUser	可否修改自己注册数要求	0	0	0	1	
@@ -34,7 +34,7 @@ date_default_timezone_set("Asia/Chongqing");
 // webSetting_hk49PlanPoet	可否修改打油诗	0	0	0	1	
 // webSetting_hk49PlanPicture	可否上传六合彩图片	0	0	0	1	
 // webSetting_outLinkName	可否修改外链名称（聊天室）	0	0	0	1	
-// webSetting_outLinkUrl	可否修改外链(聊天室链接？)	0	0	0	1	
+// webSetting_bulletinShow	可否开关首页公告弹窗	0	0	0	1	
 // webSetting_baiduStatistics	可否修改百度统计的代码	0	0	0	1	
 // webSetting_updateUserPsw	可否修改_会员可否修改自己的密码	1	1	1	1	
 // webSetting_submitUpdateUserLevel	可否修改_会员可否提交次级代理申请	1	1	1	1	
@@ -78,7 +78,7 @@ class adminLimit
     private $id;
     private $userID;
     private $webSetting_siteLink;
-    private $webSetting_siteName;
+    private $webSetting_siteConfig;
     private $webSetting_publicAuthorization;
     private $webSetting_shareRequiredIP;
     private $webSetting_shareRequiredUser;
@@ -109,7 +109,7 @@ class adminLimit
     private $webSetting_hk49PlanPoet;
     private $webSetting_hk49PlanPicture;
     private $webSetting_outLinkName;
-    private $webSetting_outLinkUrl;
+    private $webSetting_bulletinShow;
     private $webSetting_baiduStatistics;
     private $webSetting_updateUserPsw;
     private $webSetting_submitUpdateUserLevel;
@@ -170,7 +170,7 @@ class adminLimit
         $this->id='0';//唯一标识
         $this->userID='0';//账号标识
         $this->webSetting_siteLink='0';//可否修改本站的链接
-        $this->webSetting_siteName='0';//可否修改本站的名称
+        $this->webSetting_siteConfig='0';//可否修改本站的基本设置
         $this->webSetting_publicAuthorization='0';//可否开关自己网站的授权
         $this->webSetting_shareRequiredIP='0';//可否修改自己分享IP数要求
         $this->webSetting_shareRequiredUser='0';//可否修改自己注册数要求
@@ -201,7 +201,7 @@ class adminLimit
         $this->webSetting_hk49PlanPoet='0';//可否修改打油诗
         $this->webSetting_hk49PlanPicture='0';//可否上传六合彩图片
         $this->webSetting_outLinkName='0';//可否修改外链名称（聊天室）
-        $this->webSetting_outLinkUrl='0';//可否修改外链(聊天室链接？)
+        $this->webSetting_bulletinShow='0';//可否开关首页公告弹窗
         $this->webSetting_baiduStatistics='0';//可否修改百度统计的代码
         $this->webSetting_updateUserPsw='1';//可否修改_会员可否修改自己的密码
         $this->webSetting_submitUpdateUserLevel='1';//可否修改_会员可否提交次级代理申请
@@ -255,7 +255,7 @@ class adminLimit
         }
         if(array_key_exists('userID', $userinfo)) {$this->userID=$userinfo ['userID'];}
         if(array_key_exists('webSetting_siteLink', $userinfo)) {$this->webSetting_siteLink=$userinfo ['webSetting_siteLink'];}
-        if(array_key_exists('webSetting_siteName', $userinfo)) {$this->webSetting_siteName=$userinfo ['webSetting_siteName'];}
+        if(array_key_exists('webSetting_siteConfig', $userinfo)) {$this->webSetting_siteConfig=$userinfo ['webSetting_siteConfig'];}
         if(array_key_exists('webSetting_publicAuthorization', $userinfo)) {$this->webSetting_publicAuthorization=$userinfo ['webSetting_publicAuthorization'];}
         if(array_key_exists('webSetting_shareRequiredIP', $userinfo)) {$this->webSetting_shareRequiredIP=$userinfo ['webSetting_shareRequiredIP'];}
         if(array_key_exists('webSetting_shareRequiredUser', $userinfo)) {$this->webSetting_shareRequiredUser=$userinfo ['webSetting_shareRequiredUser'];}
@@ -286,7 +286,7 @@ class adminLimit
         if(array_key_exists('webSetting_hk49PlanPoet', $userinfo)) {$this->webSetting_hk49PlanPoet=$userinfo ['webSetting_hk49PlanPoet'];}
         if(array_key_exists('webSetting_hk49PlanPicture', $userinfo)) {$this->webSetting_hk49PlanPicture=$userinfo ['webSetting_hk49PlanPicture'];}
         if(array_key_exists('webSetting_outLinkName', $userinfo)) {$this->webSetting_outLinkName=$userinfo ['webSetting_outLinkName'];}
-        if(array_key_exists('webSetting_outLinkUrl', $userinfo)) {$this->webSetting_outLinkUrl=$userinfo ['webSetting_outLinkUrl'];}
+        if(array_key_exists('webSetting_bulletinShow', $userinfo)) {$this->webSetting_bulletinShow=$userinfo ['webSetting_bulletinShow'];}
         if(array_key_exists('webSetting_baiduStatistics', $userinfo)) {$this->webSetting_baiduStatistics=$userinfo ['webSetting_baiduStatistics'];}
         if(array_key_exists('webSetting_updateUserPsw', $userinfo)) {$this->webSetting_updateUserPsw=$userinfo ['webSetting_updateUserPsw'];}
         if(array_key_exists('webSetting_submitUpdateUserLevel', $userinfo)) {$this->webSetting_submitUpdateUserLevel=$userinfo ['webSetting_submitUpdateUserLevel'];}
@@ -334,8 +334,8 @@ class adminLimit
             return $flag;
         }
      
-        $sql = "INSERT INTO adminLimit (userID,webSetting_siteLink,webSetting_siteName,webSetting_publicAuthorization,webSetting_shareRequiredIP,webSetting_shareRequiredUser,webSetting_shareLimiteTime,webSetting_apiSelect,webSetting_defaultPlanID,webSetting_historyLimit,webSetting_leaderboardLimit,webSetting_historyPlanShowLimit,webSetting_needAuthorize,webSetting_stringUserTitle,webSetting_registerQQ,webSetting_registerWechat,webSetting_registerPhone,webSetting_registerEmail,webSetting_loginKeep,webSetting_csQQ,webSetting_csQQGroup,webSetting_csWechat,webSetting_csEmail,webSetting_ezunLink,webSetting_autoEzunLink,webSetting_hk49plan1,webSetting_hk49plan2,webSetting_hk49plan3,webSetting_hk49plan4,webSetting_hk49plan5,webSetting_hk49PlanPoet,webSetting_hk49PlanPicture,webSetting_outLinkName,webSetting_outLinkUrl,webSetting_baiduStatistics,webSetting_updateUserPsw,webSetting_submitUpdateUserLevel,webSetting_updateUserQQ,webSetting_updateUserWechat,webSetting_updateUserPhone,webSetting_updateUserEmail,webSetting_mark1,webSetting_mark2,webSetting_mark3,webSetting_mark4,webSetting_mark5,user_userName,user_userPsw,user_userQQ,user_userWechat,user_userPhone,user_userEmail,user_verifyQQ,user_verifyWechat,user_verifyPhone,user_verifyEmail,create_user_3,create_user_2,create_user_1,user_authorizationStatus,show_all_user,user_agentStatus,user_agentAdmin,user_agentTop,user_agentDirect,user_userActive,user_userTitle,mark1,mark2,mark3,mark4,mark5)
-            VALUES ('$this->userID', '$this->webSetting_siteLink', '$this->webSetting_siteName', '$this->webSetting_publicAuthorization', '$this->webSetting_shareRequiredIP', '$this->webSetting_shareRequiredUser','$this->webSetting_shareLimiteTime', '$this->webSetting_apiSelect', '$this->webSetting_defaultPlanID', '$this->webSetting_historyLimit', '$this->webSetting_leaderboardLimit', '$this->webSetting_historyPlanShowLimit', '$this->webSetting_needAuthorize', '$this->webSetting_stringUserTitle', '$this->webSetting_registerQQ', '$this->webSetting_registerWechat', '$this->webSetting_registerPhone', '$this->webSetting_registerEmail', '$this->webSetting_loginKeep', '$this->webSetting_csQQ', '$this->webSetting_csQQGroup', '$this->webSetting_csWechat', '$this->webSetting_csEmail', '$this->webSetting_ezunLink', '$this->webSetting_autoEzunLink', '$this->webSetting_hk49plan1', '$this->webSetting_hk49plan2', '$this->webSetting_hk49plan3', '$this->webSetting_hk49plan4', '$this->webSetting_hk49plan5', '$this->webSetting_hk49PlanPoet', '$this->webSetting_hk49PlanPicture', '$this->webSetting_outLinkName', '$this->webSetting_outLinkUrl', '$this->webSetting_baiduStatistics','$this->webSetting_updateUserPsw','$this->webSetting_submitUpdateUserLevel','$this->webSetting_updateUserQQ','$this->webSetting_updateUserWechat','$this->webSetting_updateUserPhone','$this->webSetting_updateUserEmail', '$this->webSetting_mark1', '$this->webSetting_mark2', '$this->webSetting_mark3', '$this->webSetting_mark4', '$this->webSetting_mark5', '$this->user_userName', '$this->user_userPsw', '$this->user_userQQ', '$this->user_userWechat', '$this->user_userPhone', '$this->user_userEmail', '$this->user_verifyQQ', '$this->user_verifyWechat', '$this->user_verifyPhone', '$this->user_verifyEmail', '$this->create_user_3', '$this->create_user_2', '$this->create_user_1', '$this->user_authorizationStatus', '$this->show_all_user', '$this->user_agentStatus', '$this->user_agentAdmin', '$this->user_agentTop', '$this->user_agentDirect', '$this->user_userActive', '$this->user_userTitle', '$this->mark1', '$this->mark2', '$this->mark3', '$this->mark4', '$this->mark5')";
+        $sql = "INSERT INTO adminLimit (userID,webSetting_siteLink,webSetting_siteConfig,webSetting_publicAuthorization,webSetting_shareRequiredIP,webSetting_shareRequiredUser,webSetting_shareLimiteTime,webSetting_apiSelect,webSetting_defaultPlanID,webSetting_historyLimit,webSetting_leaderboardLimit,webSetting_historyPlanShowLimit,webSetting_needAuthorize,webSetting_stringUserTitle,webSetting_registerQQ,webSetting_registerWechat,webSetting_registerPhone,webSetting_registerEmail,webSetting_loginKeep,webSetting_csQQ,webSetting_csQQGroup,webSetting_csWechat,webSetting_csEmail,webSetting_ezunLink,webSetting_autoEzunLink,webSetting_hk49plan1,webSetting_hk49plan2,webSetting_hk49plan3,webSetting_hk49plan4,webSetting_hk49plan5,webSetting_hk49PlanPoet,webSetting_hk49PlanPicture,webSetting_outLinkName,webSetting_bulletinShow,webSetting_baiduStatistics,webSetting_updateUserPsw,webSetting_submitUpdateUserLevel,webSetting_updateUserQQ,webSetting_updateUserWechat,webSetting_updateUserPhone,webSetting_updateUserEmail,webSetting_mark1,webSetting_mark2,webSetting_mark3,webSetting_mark4,webSetting_mark5,user_userName,user_userPsw,user_userQQ,user_userWechat,user_userPhone,user_userEmail,user_verifyQQ,user_verifyWechat,user_verifyPhone,user_verifyEmail,create_user_3,create_user_2,create_user_1,user_authorizationStatus,show_all_user,user_agentStatus,user_agentAdmin,user_agentTop,user_agentDirect,user_userActive,user_userTitle,mark1,mark2,mark3,mark4,mark5)
+            VALUES ('$this->userID', '$this->webSetting_siteLink', '$this->webSetting_siteConfig', '$this->webSetting_publicAuthorization', '$this->webSetting_shareRequiredIP', '$this->webSetting_shareRequiredUser','$this->webSetting_shareLimiteTime', '$this->webSetting_apiSelect', '$this->webSetting_defaultPlanID', '$this->webSetting_historyLimit', '$this->webSetting_leaderboardLimit', '$this->webSetting_historyPlanShowLimit', '$this->webSetting_needAuthorize', '$this->webSetting_stringUserTitle', '$this->webSetting_registerQQ', '$this->webSetting_registerWechat', '$this->webSetting_registerPhone', '$this->webSetting_registerEmail', '$this->webSetting_loginKeep', '$this->webSetting_csQQ', '$this->webSetting_csQQGroup', '$this->webSetting_csWechat', '$this->webSetting_csEmail', '$this->webSetting_ezunLink', '$this->webSetting_autoEzunLink', '$this->webSetting_hk49plan1', '$this->webSetting_hk49plan2', '$this->webSetting_hk49plan3', '$this->webSetting_hk49plan4', '$this->webSetting_hk49plan5', '$this->webSetting_hk49PlanPoet', '$this->webSetting_hk49PlanPicture', '$this->webSetting_outLinkName', '$this->webSetting_bulletinShow', '$this->webSetting_baiduStatistics','$this->webSetting_updateUserPsw','$this->webSetting_submitUpdateUserLevel','$this->webSetting_updateUserQQ','$this->webSetting_updateUserWechat','$this->webSetting_updateUserPhone','$this->webSetting_updateUserEmail', '$this->webSetting_mark1', '$this->webSetting_mark2', '$this->webSetting_mark3', '$this->webSetting_mark4', '$this->webSetting_mark5', '$this->user_userName', '$this->user_userPsw', '$this->user_userQQ', '$this->user_userWechat', '$this->user_userPhone', '$this->user_userEmail', '$this->user_verifyQQ', '$this->user_verifyWechat', '$this->user_verifyPhone', '$this->user_verifyEmail', '$this->create_user_3', '$this->create_user_2', '$this->create_user_1', '$this->user_authorizationStatus', '$this->show_all_user', '$this->user_agentStatus', '$this->user_agentAdmin', '$this->user_agentTop', '$this->user_agentDirect', '$this->user_userActive', '$this->user_userTitle', '$this->mark1', '$this->mark2', '$this->mark3', '$this->mark4', '$this->mark5')";
      
         $result = mysqli_query($conn, $sql);
         if ($result=== true) {

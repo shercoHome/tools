@@ -150,7 +150,20 @@ class authorizationWBStatus
             $sql.=" AND a.userIupdaterD='$this->updater'";
         }
 
-        $sql.=" ORDER BY a.updateTime DESC";
+      
+        if (array_key_exists("sort", $userinfo)) {
+            $sort = $userinfo ["sort"]; 
+            
+            if($sort=="1"){$sql.=" ORDER BY a.loginTime DESC";}// <el-option label="登录倒序" value="1"></el-option>
+            if($sort=="2"){$sql.=" ORDER BY a.loginTime";}// <el-option label="登录顺序" value="2"></el-option>
+            if($sort=="3"){$sql.=" ORDER BY u.registerTime DESC";}// <el-option label="注册倒序" value="3"></el-option>
+            if($sort=="4"){$sql.=" ORDER BY u.registerTime";}// <el-option label="注册顺序" value="4"></el-option>
+            if($sort=="5"){$sql.=" ORDER BY a.updateTime DESC";}// <el-option label="授权倒序" value="5"></el-option>
+            if($sort=="6"){$sql.=" ORDER BY a.updateTime";}// <el-option label="授权顺序" value="6"></el-option>
+
+        }else{
+            $sql.=" ORDER BY a.updateTime DESC";
+        }
 
         if (array_key_exists("n", $info)) { 
             $page=1;
@@ -252,11 +265,11 @@ class authorizationWBStatus
                 mysqli_query($conn, $userSql);
             }else{
                 if (array_key_exists('id', $userinfo)) {
-                    $userSql="UPDATE user u,authorizationWBStatus,a SET u.authorizationStatus='0' 
+                    $userSql="UPDATE user u,authorizationWBStatus,a SET u.authorizationStatus='$this->wbStatus' 
                     WHERE a.userID=u.id AND a.id='$this->id'";
                 }
                 if (array_key_exists('userID', $userinfo)) {
-                    $userSql="UPDATE user SET authorizationStatus='0'
+                    $userSql="UPDATE user SET authorizationStatus='$this->wbStatus'
                     WHERE id='$this->userID'";
                 }
                 mysqli_query($conn, $userSql);

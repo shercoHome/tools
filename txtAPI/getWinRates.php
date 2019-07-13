@@ -1,5 +1,8 @@
 ﻿<?php
-require '../sqlAPI/allowOrigin.php';
+//require '../sqlAPI/allowOrigin.php';
+
+$fileTempMK="../api_admin_sql/";
+require $fileTempMK.'allowOrigin.php';
 
 
 
@@ -13,7 +16,7 @@ require '../sqlAPI/allowOrigin.php';
 
 
 $api="pk10";//哪个文件夹  彩种
-$plan_ways=0;   //玩法 
+$plan_ways=0;   //玩法
 $plan_positon=0;   //  冠 亚 和...
 $plan_numbers=0;   //几码
 $q=1;  //几期计划
@@ -76,21 +79,21 @@ if (is_array($_GET)&&count($_GET)>0) {
             $token=$_GET["tk"];
 
             //  启动 Session
-session_start();
-$_SESSION["token"] = $token;
+            session_start();
+            $_SESSION["token"] = $token;
     
-        require_once '../sqlAPI/class.common.php';
+            require_once  $fileTempMK.'class.common.php';
             $__common=new commonFun();
             $__temp =$__common->decrypt($token);
          
-            $__tempAr=explode("|",$__temp);
+            $__tempAr=explode("|", $__temp);
             $token_userID=$__tempAr[1];//用户id
             $token_webID=$__tempAr[2];//网站id
             $token_loginKeep=$__tempAr[3];//登录有效时长  分钟
             $authorizationStatus=$__tempAr[4];//用户授权状态
 
             // 在此读取网站配置表，以当前访问的网站为准
-            require_once '../sqlAPI/class.websetting.php';
+            require_once  $fileTempMK.'class.websetting.php';
             $DBset=new websetting();
             $json_set=$DBset->show(array('id'=>$token_webID))[0];//读取配置表中
 
@@ -99,60 +102,59 @@ $_SESSION["token"] = $token;
             $history_limit=$json_set['historyLimit'];//统计几期胜率
             $needAuthorizeStr=$json_set['needAuthorize'];//默认的一个计划可以直接查看计划，无需要授权
             //解析  all|1-3||js|1-3  这样的字符串
-            $needAuthorizeLotterysArr=explode('||',$needAuthorizeStr);
+            $needAuthorizeLotterysArr=explode('||', $needAuthorizeStr);
             $needAuthorizeLotterysArrlength=count($needAuthorizeLotterysArr);
             $temp="0-0";
-            for($x=0;$x<$needAuthorizeLotterysArrlength;$x++) {
-                $needAuthorize_One=explode('|',$needAuthorizeLotterysArr[$x]);
-                if($needAuthorize_One[0]=="all"){
+            for ($x=0;$x<$needAuthorizeLotterysArrlength;$x++) {
+                $needAuthorize_One=explode('|', $needAuthorizeLotterysArr[$x]);
+                if ($needAuthorize_One[0]=="all") {
                     $temp=$needAuthorize_One[1];
                 }
-                if($needAuthorize_One[0]==$api){
+                if ($needAuthorize_One[0]==$api) {
                     $temp=$needAuthorize_One[1];
                 }
             }
-            $tempArr=explode('-',$temp);
-            if(count($tempArr)<2){
+            $tempArr=explode('-', $temp);
+            if (count($tempArr)<2) {
                 $tempArr[1]=$tempArr[0];
             }
             $needAuthorize_array=$tempArr;
             if (isset($_GET["w"])) {
                 if (strlen($_GET["w"])>0) {
-                        $whitePlanId=$_GET["w"];//返回（随机当前最佳计划）到这里并视为可直接查看
+                    $whitePlanId=$_GET["w"];//返回（随机当前最佳计划）到这里并视为可直接查看
                 }
             }
 
-          //  if ($id==$defaultPlanID) {//默认计划，无须授权，可直接查看
+            //  if ($id==$defaultPlanID) {//默认计划，无须授权，可直接查看
            //     $userAuthorize="1";
          //   }else{
-                if($check=="1"){// 开启了检测，所以要再检测登录用户的授权
-                    if($token_userID!="0"){
-                        require_once '../sqlAPI/class.logLogin.php';
+                if ($check=="1") {// 开启了检测，所以要再检测登录用户的授权
+                    if ($token_userID!="0") {
+                        require $fileTempMK.'class.logLogin.php';
                         $logLogin=new logLogin();
                         $isLogin=$logLogin->checkToken($userID, $token);
                         if ($isLogin===true) {
                             // 登录id为  $token_userID
-                            // require_once '../sqlAPI/class.user.php';
+                            // require $fileTempMK.'class.user.php';
                             // $DBuser=new user();
                             // $userInfoAr=$DBuser->show(array("id"=>$token_userID));
                             // $userInfoJson=$userInfoAr[0];
                             // $authorizationStatus=$userInfoJson['authorizationStatus'];
-                            if($authorizationStatus=="1"||$authorizationStatus=="3") //0,2   1,3
-                            {
+                            if ($authorizationStatus=="1"||$authorizationStatus=="3") { //0,2   1,3
                                 $userAuthorize="1";
                             }
-                        }else{
+                        } else {
                             //登录token无效
                             //未登录状态
                         }
-                    }else{
-                         //未登录状态的token
+                    } else {
+                        //未登录状态的token
                     }
-                }else{
+                } else {
                     //没有开启检测，所有人都可以查看
                     $userAuthorize="1";
                 }
-          //  }
+            //  }
         }
     }
 
@@ -167,21 +169,21 @@ $_SESSION["token"] = $token;
 
 
     ////开奖时间，13:09~~ 次日 04：04
-    if($api=="lucky-air-ship"){
+    if ($api=="lucky-air-ship") {
         $nowtime=date("Y-m-d H:i:s");
         $firstTime=date("Y-m-d")." 04:09:00";
-        if(strtotime($nowtime)<strtotime($firstTime)){
+        if (strtotime($nowtime)<strtotime($firstTime)) {
             $mk_day=date("Ymd", strtotime("-1 day"));
         }
     }
-        ////开奖时间，09:00~~ 次日 00：00
-        if($api=="pc28"){
-            $nowtime=date("Y-m-d H:i:s");
-            $firstTime=date("Y-m-d")." 00:05:00";
-            if(strtotime($nowtime)<strtotime($firstTime)){
-                $mk_day=date("Ymd", strtotime("-1 day"));
-            }
+    ////开奖时间，09:00~~ 次日 00：00
+    if ($api=="pc28") {
+        $nowtime=date("Y-m-d H:i:s");
+        $firstTime=date("Y-m-d")." 00:05:00";
+        if (strtotime($nowtime)<strtotime($firstTime)) {
+            $mk_day=date("Ymd", strtotime("-1 day"));
         }
+    }
 
 
     $dir=$api."/txt-kj/".$mk_day;
@@ -206,12 +208,82 @@ $_SESSION["token"] = $token;
         if ($id==-1) {
             echo json_encode($WinRate->getAllRate());
         } else {
-           // echo json_encode($WinRate->getOneRate());
+            // echo json_encode($WinRate->getOneRate());
             echo json_encode($WinRate->getAllRate($id));
         }
-     
     } else {
-        echo 'Unable to open dir!';
+        if (strpos($api, '||')!==false) {
+            $apiarr=explode('||', $api);
+            require_once 'WinRate.php';
+            $WinRate=new WinRate(array("api"=>$api));
+            $kj_dir=$apiarr[0]."/txt-kj/".$apiarr[1];
+            $count=$apiarr[2];
+            $historyArr=$WinRate->get_today_kj($kj_dir);
+
+            $historyArr=array_slice($historyArr,0,$count,true);
+
+            ksort($historyArr);
+
+            $__tempALL=array();//  期号expect  开奖opencode miss遗漏 array（万位遗漏，千位遗漏...）
+            $__tempMark=array();
+            foreach ($historyArr as $x=>$x_value) {
+
+                $__tempOne=array();
+                $__tempOne['expect']=$x;
+                ///////////////
+                $x_value_arr= explode('|||', $x_value);
+                $kj_str=$x_value_arr[0];
+                $__tempOne['opencode']=$kj_str;
+                /////////////////////
+                $kj_arr= explode(',', $kj_str);
+                $kj_arr_count=count($kj_arr);
+                $__tempOne['miss']=array();
+                /////////////////////
+                for ($kk=0;$kk<$kj_arr_count;$kk++) {
+                    $kj_arr_one=$kj_arr[$kk];
+                    if($kj_arr_count==10){ $reARR=["01","02","03","04","05","06","07","08","09","10"];}
+                    if($kj_arr_count==5){ $reARR=[0,1,2,3,4,5,6,7,8,9];}
+                    if($kj_arr_count==3){ 
+                        //pc蛋蛋
+                        $reARR=[0,1,2,3,4,5,6,7,8,9];
+                        //快3类
+                        if(strpos($apiarr[0],"k3")!==false){
+                            $reARR=[1,2,3,4,5,6];
+                        }
+
+                    }
+                    $count_reARR=count($reARR);
+                    $i__=$x-1;
+                    $__temp_temp=array();
+                    if (isset($historyArr[$i__.''])) {
+                        for ($ii=0;$ii< $count_reARR;$ii++) {
+                            if ($kj_arr_one==$reARR[$ii]) {
+                                $__temp_temp[]=$kj_arr_one;
+                            } else {
+                               $__temp_temp[]=$__tempMark[$kk][$ii]>0?-1:($__tempMark[$kk][$ii]-1);
+                            }
+                        }
+                    } else {
+                        for ($ii=0;$ii< $count_reARR;$ii++) {
+                            if ($kj_arr_one==$reARR[$ii]) {
+                                $__temp_temp[]=$kj_arr_one;
+                            } else {
+                                $__temp_temp[]=-1;
+                            }
+                        }
+                    }
+                    $__tempOne['miss'][] = $__temp_temp;
+                }
+                $__tempMark=$__tempOne['miss'];
+                $__tempALL[]=$__tempOne;
+             
+            }
+                    //数组按 其内的二维数组的key排序
+            array_multisort(array_column($__tempALL, 'expect'), SORT_DESC, $__tempALL);
+            print_r(json_encode($__tempALL));
+        } else {
+            echo 'Unable to open dir to get win-rates!'.$api;
+        }
     }
 } else {
     echo '{err:"No parameters"}';

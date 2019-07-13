@@ -8,7 +8,11 @@ $allow_origin = array(
     'http://www.beer668.cn',
     'http://duke.com:8080',
     'http://duke.com:8081',
-    'http://www.ezun666.cn'
+    'http://www.ezun666.cn',
+    'http://plan.dachengplan.com',
+    'http://apiforadmin.dachengplan.com',
+    'http://apiforplan.dachengplan.com',
+    'http://admin.dachengplan.com'
 );
 $file_path=dirname(__FILE__).'/class.websetting.php';
 try {

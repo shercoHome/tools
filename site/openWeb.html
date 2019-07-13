@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>批量域名site</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        textarea {
+            height: 100px;
+            width: 600px;
+        }
+
+        table {
+            /* width: 100%; */
+            margin: 0 auto;
+            font-family: verdana, arial, sans-serif;
+            font-size: 11px;
+            color: #333333;
+            border-width: 1px;
+            border-color: #666666;
+            border-collapse: collapse;
+        }
+
+        table th {
+            text-align: center;
+            color: #FFF;
+            border-width: 1px;
+            padding: 5px;
+            border-style: solid;
+            border-color: #666666;
+            background-color: #37393a;
+            vertical-align: middle;
+            /*background-color: #dedede;*/
+        }
+
+        table td {
+            text-align: center;
+            border-width: 1px;
+            padding: 2px 5px;
+            border-style: solid;
+            border-color: #666666;
+            text-align: center;
+            /*background-color: #ffffff;*/
+        }
+
+        #limitYear {
+            width: 40px;
+            text-align: center;
+        }
+
+        #info b {
+            font-size: 24px;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <p><a href="openWeb.html">批量访问</a>|<a href="siteBaidu.html">批量域名site</a>|<a href="dfz.html">域名分组</a>|<a
+            href="get-history.html">域名历史</a></p>
+    域名分组：请输入域名（一行一个）:<br>
+    <textarea id="domains">rgjh999.cn
+rgjh222.cn
+rgjh777.cn
+rgjh555.cn
+rgjh444.cn
+rgjh333.cn
+rgjh111.cn
+rgjh666.cn
+rgjh888.cn
+rgjh000.cn
+rgjh119.cn
+rgjh120.cn
+rgjh110.cn
+rgjh163.cn</textarea>
+    <br>
+    <p id="info">同时访问<input id="myDomainOnlineLimte" type="number" step="1" value="3"
+            style="width:3em" />个域名，每个域名访问<input id="myTimeCloseDomain" type="number" step="1" value="10"
+            style="width:3em" />秒后自动关闭</p>
+    <button id="start">开始访问</button> <input type="checkbox" id="addwww" name="addwww" value="1" checked><label
+        for="addwww">同时打开 加www的域名，打开窗口数X2</label>
+
+    <br>
+    <hr>
+    <script>
+        var max;
+        var t;
+        var info = document.getElementById("info");
+        var myTimeCloseDomain;
+        var myDomainOnlineLimte;
+        var domain_array = [];
+        var domain_count = 0;
+
+        $(document).ready(function () {
+
+            $("#start").click(function () {
+                t = Date.parse(new Date());
+                var textarea = document.getElementById("domains").value;
+
+                var addwww = document.getElementById("addwww").checked;
+
+                myTimeCloseDomain = document.getElementById("myTimeCloseDomain").value;
+                myDomainOnlineLimte = document.getElementById("myDomainOnlineLimte").value;
+
+
+                // var dArr = textarea.split(/[(\r\n)\r\n]+/);
+                domain_array = textarea.split(/[\r\n]+/);
+                domain_count = domain_array.length;
+
+
+                openWeb(0);
+            });
+        });
+
+        function openWeb(__countMark) {
+
+
+
+
+            // myDomainOnlineLimte 同时打开n个
+            for (var i = 0; (i < myDomainOnlineLimte && __countMark <= domain_count); i++) {
+
+
+                (function (__countMark__, _addwww_) {
+                    let _window_ = window.open("http://" + domain_array[__countMark__]);
+                    let _window_www=null;
+
+                    if (_addwww_) {
+                        _window_www = window.open("http://www." + domain_array[__countMark__]);
+                    }
+
+                    setTimeout(function () {
+                        _window_.close();
+                        if (_addwww_) _window_www.close();
+                    }, myTimeCloseDomain * 1000);
+
+                })(__countMark, addwww);
+                __countMark++;
+
+                if (i + 1 == myDomainOnlineLimte) {
+                    setTimeout(function () {
+                         openWeb(__countMark);
+                    }, myTimeCloseDomain * 1000);
+                }
+            }
+
+        }
+
+
+    </script>
+</body>
+
+</html>

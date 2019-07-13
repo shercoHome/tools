@@ -3,11 +3,11 @@ date_default_timezone_set("Asia/Chongqing");
 // id	唯一标识	0	自增，唯一			
 // userID	代理账号	isNull	来自user表，即会员账号			必填
 // siteLink	计划官网链接	isNull	一个链接对应到一个代理账号			必填
-// siteName	计划官网名称	isNull				
+// siteConfig	计划官网的基本设置	isNull				
 // publicAuthorization	全局授权	0	不开启0	开启1		优先从上级获取
 // shareRequiredIP	分享IP数要求	0	无要求0	其它数为具体要求，达到可开启授权		优先从上级获取
 // shareRequiredUser	分享注册数要求	0	无要求0	其它数为具体要求，达到可开启授权		优先从上级获取
-// shareLimiteTime	分享授权持续的时间	0	0永久，n 天	
+// shareLimiteTime	授权持续的时间	0|0 分享授权|荣誉授权	0永久，n 天	
 // apiSelect	默认显示的彩种	0				
 // defaultPlanID	默认显示的计划代码	0	按当前胜率第几名		优先从上级获取
 // historyLimit	显示近N期的胜率	100  	n中几		
@@ -34,7 +34,7 @@ date_default_timezone_set("Asia/Chongqing");
 // hk49PlanPoet	六合打油诗	isNull				优先从上级获取
 // hk49PlanPicture	六合图	isNull				优先从上级获取
 // outLinkName	一个外链名称	聊天室				优先从上级获取
-// outLinkUrl	一个外链地址	isNull	有填写时，会启用，如http://ezun.yabomg.com			优先从上级获取
+// bulletinShow	首页公告弹窗开关	0	不开启0，开启1	
 // baiduStatistics	百度统计的代码	isNull	5aae175363290255b62c0f8e066ef1cb			
 // updateUserPsw	会员可否修改自己的密码	1				
 // submitUpdateUserLevel	会员可否提交次级代理申请	1				
@@ -56,7 +56,7 @@ class webSetting
     private $id;
     private $userID;
     private $siteLink;
-    private $siteName;
+    private $siteConfig;
     private $publicAuthorization;
     private $shareRequiredIP;
     private $shareRequiredUser;
@@ -87,7 +87,7 @@ class webSetting
     private $hk49PlanPoet;
     private $hk49PlanPicture;
     private $outLinkName;
-    private $outLinkUrl;
+    private $bulletinShow;
     private $baiduStatistics;
     private $updateUserPsw;
     private $submitUpdateUserLevel;
@@ -122,11 +122,11 @@ class webSetting
         $this->id='0';//唯一标识
         $this->userID='isNull';//代理账号
         $this->siteLink='isNull';//计划官网链接
-        $this->siteName='isNull';//计划官网名称
+        $this->siteConfig='网站名称|slogan|isNull|#201617|计划无神，跟反自由';//计划官网名称
         $this->publicAuthorization='0';//全局授权
         $this->shareRequiredIP='0';//分享IP数要求
-        $this->shareRequiredUser='0';//分享授权持续的时间 0永久，n 天
-        $this->shareLimiteTime='0';//分享注册数要求
+        $this->shareRequiredUser='0';//分享注册数要求
+        $this->shareLimiteTime='0|0';//授权持续的时间 分享授权|荣誉授权  0永久，n 天
         $this->apiSelect='1';//默认显示的彩种
         $this->defaultPlanID='3';//默认显示的计划代码 按当前胜率第几名
         $this->historyLimit='100';//显示近N期的胜率
@@ -153,7 +153,7 @@ class webSetting
         $this->hk49PlanPoet='isNull';//六合打油诗
         $this->hk49PlanPicture='isNull';//六合图
         $this->outLinkName='聊天室';//一个外链名称
-        $this->outLinkUrl='isNull';//一个外链地址
+        $this->bulletinShow='0';//首页公告开关
         $this->baiduStatistics='isNull';//百度统计的代码
         $this->updateUserPsw='1';//会员可否修改自己的密码
         $this->submitUpdateUserLevel='1';//会员可否提交次级代理申请
@@ -182,7 +182,7 @@ class webSetting
         }
         if(array_key_exists('userID', $userinfo)) {$this->userID=$userinfo ['userID'];}
         if(array_key_exists('siteLink', $userinfo)) {$this->siteLink=$userinfo ['siteLink'];}
-        if(array_key_exists('siteName', $userinfo)) {$this->siteName=$userinfo ['siteName'];}
+        if(array_key_exists('siteConfig', $userinfo)) {$this->siteConfig=$userinfo ['siteConfig'];}
         if(array_key_exists('publicAuthorization', $userinfo)) {$this->publicAuthorization=$userinfo ['publicAuthorization'];}
         if(array_key_exists('shareRequiredIP', $userinfo)) {$this->shareRequiredIP=$userinfo ['shareRequiredIP'];}
         if(array_key_exists('shareRequiredUser', $userinfo)) {$this->shareRequiredUser=$userinfo ['shareRequiredUser'];}
@@ -213,7 +213,7 @@ class webSetting
         if(array_key_exists('hk49PlanPoet', $userinfo)) {$this->hk49PlanPoet=$userinfo ['hk49PlanPoet'];}
         if(array_key_exists('hk49PlanPicture', $userinfo)) {$this->hk49PlanPicture=$userinfo ['hk49PlanPicture'];}
         if(array_key_exists('outLinkName', $userinfo)) {$this->outLinkName=$userinfo ['outLinkName'];}
-        if(array_key_exists('outLinkUrl', $userinfo)) {$this->outLinkUrl=$userinfo ['outLinkUrl'];}
+        if(array_key_exists('bulletinShow', $userinfo)) {$this->bulletinShow=$userinfo ['bulletinShow'];}
         if(array_key_exists('baiduStatistics', $userinfo)) {$this->baiduStatistics=$userinfo ['baiduStatistics'];}
         if(array_key_exists('updateUserPsw', $userinfo)) {$this->updateUserPsw=$userinfo ['updateUserPsw'];}
         if(array_key_exists('submitUpdateUserLevel', $userinfo)) {$this->submitUpdateUserLevel=$userinfo ['submitUpdateUserLevel'];}
@@ -235,8 +235,8 @@ class webSetting
             return $flag;
         }
      
-        $sql = "INSERT INTO webSetting (userID,siteLink,siteName,publicAuthorization,shareRequiredIP,shareRequiredUser,shareLimiteTime,apiSelect,defaultPlanID,historyLimit,leaderboardLimit,historyPlanShowLimit,needAuthorize,stringUserTitle,registerQQ,registerWechat,registerPhone,registerEmail,loginKeep,csQQ,csQQGroup,csWechat,csEmail,ezunLink,autoEzunLink,hk49plan1,hk49plan2,hk49plan3,hk49plan4,hk49plan5,hk49PlanPoet,hk49PlanPicture,outLinkName,outLinkUrl,baiduStatistics,updateUserPsw,submitUpdateUserLevel,updateUserQQ,updateUserWechat,updateUserPhone,updateUserEmail,mark1,mark2,mark3,mark4,mark5)
-            VALUES ('$this->userID', '$this->siteLink', '$this->siteName', '$this->publicAuthorization', '$this->shareRequiredIP', '$this->shareRequiredUser','$this->shareLimiteTime', '$this->apiSelect', '$this->defaultPlanID', '$this->historyLimit', '$this->leaderboardLimit', '$this->historyPlanShowLimit', '$this->needAuthorize', '$this->stringUserTitle', '$this->registerQQ', '$this->registerWechat', '$this->registerPhone', '$this->registerEmail', '$this->loginKeep', '$this->csQQ', '$this->csQQGroup', '$this->csWechat', '$this->csEmail', '$this->ezunLink', '$this->autoEzunLink', '$this->hk49plan1', '$this->hk49plan2', '$this->hk49plan3', '$this->hk49plan4', '$this->hk49plan5', '$this->hk49PlanPoet', '$this->hk49PlanPicture', '$this->outLinkName', '$this->outLinkUrl', '$this->baiduStatistics', '$this->updateUserPsw', '$this->submitUpdateUserLevel', '$this->updateUserQQ', '$this->updateUserWechat', '$this->updateUserPhone', '$this->updateUserEmail', '$this->mark1', '$this->mark2', '$this->mark3', '$this->mark4', '$this->mark5')";
+        $sql = "INSERT INTO webSetting (userID,siteLink,siteConfig,publicAuthorization,shareRequiredIP,shareRequiredUser,shareLimiteTime,apiSelect,defaultPlanID,historyLimit,leaderboardLimit,historyPlanShowLimit,needAuthorize,stringUserTitle,registerQQ,registerWechat,registerPhone,registerEmail,loginKeep,csQQ,csQQGroup,csWechat,csEmail,ezunLink,autoEzunLink,hk49plan1,hk49plan2,hk49plan3,hk49plan4,hk49plan5,hk49PlanPoet,hk49PlanPicture,outLinkName,bulletinShow,baiduStatistics,updateUserPsw,submitUpdateUserLevel,updateUserQQ,updateUserWechat,updateUserPhone,updateUserEmail,mark1,mark2,mark3,mark4,mark5)
+            VALUES ('$this->userID', '$this->siteLink', '$this->siteConfig', '$this->publicAuthorization', '$this->shareRequiredIP', '$this->shareRequiredUser','$this->shareLimiteTime', '$this->apiSelect', '$this->defaultPlanID', '$this->historyLimit', '$this->leaderboardLimit', '$this->historyPlanShowLimit', '$this->needAuthorize', '$this->stringUserTitle', '$this->registerQQ', '$this->registerWechat', '$this->registerPhone', '$this->registerEmail', '$this->loginKeep', '$this->csQQ', '$this->csQQGroup', '$this->csWechat', '$this->csEmail', '$this->ezunLink', '$this->autoEzunLink', '$this->hk49plan1', '$this->hk49plan2', '$this->hk49plan3', '$this->hk49plan4', '$this->hk49plan5', '$this->hk49PlanPoet', '$this->hk49PlanPicture', '$this->outLinkName', '$this->bulletinShow', '$this->baiduStatistics', '$this->updateUserPsw', '$this->submitUpdateUserLevel', '$this->updateUserQQ', '$this->updateUserWechat', '$this->updateUserPhone', '$this->updateUserEmail', '$this->mark1', '$this->mark2', '$this->mark3', '$this->mark4', '$this->mark5')";
      
         $result = mysqli_query($conn, $sql);
         if ($result=== true) {
@@ -278,26 +278,43 @@ class webSetting
             return $flag;
         }
 
-        $sql="SELECT  u.userName,a.* FROM webSetting a,user u WHERE a.userID=u.id ";
+      //  $sql="SELECT u.userName,u.userLevel,a.* FROM webSetting a,user u WHERE a.userID=u.id ";
+        $sql="SELECT  u.userName,u.userLevel,a.*,agent.userName AS agentName FROM webSetting a,user u,user agent WHERE a.userID=u.id AND u.agentDirect=agent.id ";
 
-        if (array_key_exists("onleySiteLink", $userinfo)) { //用户账号
-            $sql="SELECT DISTINCT siteLink FROM webSetting";
-        }
+
         if (array_key_exists("userName", $userinfo)) { //用户账号
             $userName=$userinfo ["userName"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE a.userID=u.id AND u.userName='$userName' ORDER BY a.userID";//ORDER BY a.id DESC ";  
+            $sql.="AND u.userName='$userName'";//ORDER BY a.id DESC ";  
         }
         if (array_key_exists("siteLink", $userinfo)) { //用户账号
             $this->siteLink=$userinfo ["siteLink"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE a.userID=u.id AND a.siteLink LIKE '%$this->siteLink%' ORDER BY a.userID";//ORDER BY a.id DESC ";  
+            $sql.="AND a.siteLink LIKE '%$this->siteLink%'";//ORDER BY a.id DESC ";  
         }
         if (array_key_exists("userID", $userinfo)) { //用户账号
             $this->userID=$userinfo ["userID"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE  a.userID=u.id AND (a.userID='$this->userID' OR u.agentDirect='$this->userID')  ORDER BY a.userID";  
+            $sql.="AND (a.userID='$this->userID' OR u.agentDirect='$this->userID')";  
         }
         if (array_key_exists("id", $userinfo)) { //用户id
             $this->id=$userinfo ["id"]; 
-            $sql="SELECT u.userName,a.*  FROM webSetting a,user u WHERE  a.userID=u.id AND a.id='$this->id'  ORDER BY a.userID";
+            $sql.="AND a.id='$this->id'";
+        }
+
+        if (array_key_exists("sort", $userinfo)) {
+            $sort = $userinfo ["sort"]; 
+            
+            if($sort=="1"){$sql.="  ORDER BY a.id DESC";}// <el-option label="登录倒序" value="1"></el-option>
+            if($sort=="2"){$sql.="  ORDER BY a.id";}// <el-option label="登录顺序" value="2"></el-option>
+            if($sort=="3"){$sql.="  ORDER BY u.userLevel DESC";}// <el-option label="注册倒序" value="3"></el-option>
+            if($sort=="4"){$sql.="  ORDER BY u.userLevel";}// <el-option label="注册顺序" value="4"></el-option>
+            if($sort=="5"){$sql.="  ORDER BY a.siteLink DESC";}// <el-option label="授权倒序" value="5"></el-option>
+            if($sort=="6"){$sql.="  ORDER BY a.siteLink";}// <el-option label="授权顺序" value="6"></el-option>
+
+        }else{
+            $sql.="  ORDER BY a.userID";
+        }
+
+        if (array_key_exists("onleySiteLink", $userinfo)) { 
+            $sql="SELECT DISTINCT siteLink FROM webSetting";
         }
         if (array_key_exists("n", $userinfo)) { 
             $page=1;

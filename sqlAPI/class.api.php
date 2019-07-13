@@ -177,13 +177,26 @@ class api
         }
         if (array_key_exists("id", $userinfo)) { //
             $this->id=$userinfo ["id"]; 
-            $sql.=" AND lid='$this->id' ";  
+            $sql.=" AND id='$this->id' ";  
         }
         if (array_key_exists("switch", $userinfo)) { //
             $this->id=$userinfo ["switch"]; 
-            $sql.=" AND lswitch='$this->switch' ";  
+            $sql.=" AND switch='$this->switch' ";  
         }
         
+
+
+        if (array_key_exists("sort", $userinfo)) {
+            $sort = $userinfo ["sort"]; 
+            
+            if($sort=="1"){$sql.=" ORDER BY id DESC";}// <el-option label="登录倒序" value="1"></el-option>
+            if($sort=="2"){$sql.=" ORDER BY id";}// <el-option label="登录顺序" value="2"></el-option>
+            if($sort=="3"){$sql.=" ORDER BY mark1 DESC";}// <el-option label="注册倒序" value="3"></el-option>
+            if($sort=="4"){$sql.=" ORDER BY mark1";}// <el-option label="注册顺序" value="4"></el-option>
+            if($sort=="5"){$sql.=" ORDER BY switch DESC, mark1 DESC";}// <el-option label="授权倒序" value="5"></el-option>
+            if($sort=="6"){$sql.=" ORDER BY switch ,mark1";}// <el-option label="授权顺序" value="6"></el-option>
+
+        }
 
         if (array_key_exists("n", $userinfo)) { 
             $page=1;

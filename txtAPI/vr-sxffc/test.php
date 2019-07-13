@@ -107,7 +107,7 @@ class vrsxffc
         if ($json!=null) {
             if (gettype($json)=="array") {
                 if (count($json)<=0) {
-                    echo "---- ".$result." ----";
+                    echo "<br> __".$result."___  \n";
                     return false;
                 }
                 usort($json,function ($a, $b){
@@ -211,7 +211,7 @@ class vrsxffc
                 }
             }
         }else{
-            echo " <br> \n ----- result=".$result." -------- <br> \n";
+            echo "<br> \n ----- result=".$result." -------- <br> \n";
         };
     }
 
@@ -385,12 +385,12 @@ class vrsxffc
 
         if (strlen($contents)<10) {
             $this->addCookie($this->cookieStr);
-            echo " <br> \n -----getCookie:  no old add temp_cookie-------- <br> \n";
+            echo "<br>--getCookie:  no old add temp_cookie--\n";
         } else {
             $this->cookieStr=$contents;
-            echo " <br> \n -----getCookie:  had old SESSION_cookie -------- <br> \n";
+            echo "<br>--getCookie:  had old SESSION_cookie--\n";
         }
-     //   echo $this->cookieStr;
+     
         return  $this->cookieStr;
     }
 
@@ -450,7 +450,7 @@ class vrsxffc
     public function add($file_name, $str)
     {
 
-        echo "try to add the result-> <br> \n";
+        echo "<br>--try to add the result--\n";
         $mk_dir="txt-kj";
   
     
@@ -467,7 +467,7 @@ class vrsxffc
 
         $path=$mk_dir."/".$mk_day."/".$file_name.".".$file_type;
 
-        echo $path."-------";
+        echo "<br>--".$path."--\n";
 
         if (!file_exists($mk_dir)) {
             mkdir($mk_dir);
@@ -484,10 +484,10 @@ class vrsxffc
 
             file_put_contents($path, $str);
 
-            echo "create succse <br> \n";
+            echo "<br>-- ****** create succse ****** --\n";
             return true;
         } else {
-            echo "create false <br> \n";
+            echo "<br>--create false--\n";
 
             return false;
         }

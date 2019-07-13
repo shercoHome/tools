@@ -1,234 +1,311 @@
 <?php
-//echo '<!Doctype html><html xmlns=http://www.w3.org/1999/xhtml><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+
 date_default_timezone_set("Asia/Chongqing");
 
-$interval=2;// ÿ��4s����
-
-$startTime = microtime(true);
-$endTime = microtime(true);
-$runTime = ($endTime-$startTime)*1000 . ' ms';
-
-if (date("G")>8) {
-    
-    do {
-        $api_statu=getApi();
-        sleep($interval);
-
-        $endTime = microtime(true);
-        $runTime = $endTime-$startTime;
-
-        $m=gmstrftime('%M:%S', $runTime);
 
 
-        echo $m." ___ ";
-    
-        echo $runTime." ___ \n";
-    } while ($runTime<5*60 && !$api_statu);
-}
- 
-
-function getApi()
+class vrsxffc
 {
-    $api='http://t.apiplus.net/newly.do?code=bjpk10&format=json';
-    $api="http://data.365rich.com/data/lottery/result/list?token=sWk2WzDa8MBg4679&type=3004&count=1";//&period=726945
-    //[{"period":"726937","numbers":["7","3","1","6","4","5","8","2","10","9"],
-    $api="https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=jspk10";
-    $api="https://luck.sdtiop.com/hall/pc/lottery/get-recent-close-expect.html?code=xy28";
-    //{"id":2807912,"expect":"201901310859","code":"jspk10","type":"pk10","openCode":"07,01,02,04,05,03,08,06,09,10",
-    //"openTime":1548915540000,"closeTime":1548915530000,"openingTime":1548915470000,"gatherTime":1548915540853,
-    //"origin":"1","date":null,"orderNum":null,
-    //"fmOpenTime":"2019-01-31 14:19:00","codeMemo":"����PK10","leftTime":0,"leftOpenTime":0},
-    // $result=file_get_contents($api);
-    $result=getHtml($api);
+    private $kjInterval;
+    private $loopInterval;
+    private $cookiePath;
 
-    $json=json_decode($result);
-    
-    if ($json!=null) {
-        if (gettype($json)=="array") {
-            $expect=$json[0]->expect;
-            $opencode=$json[0]->openCode;
+    private $api;
+
+    private $referURL;
+    private $origin;
+
+    private $nowTime;
+    private $kjTime;
+    private $jsTime;
+
+    private $oneMID;
+    private $sumMID;
+
+    private $cookieStr;
+
+
+
+    public function __construct()
+    {
+        $isLuck=true;
+        //$isLuck=true;//幸运彩票 true   龙头彩票 false
+
+        $isTEST=false;
+
+        $dir= dirname(__FILE__);
+
+        $this->kjInterval = 5*60;//每期1分钟  179期
+        $this->loopInterval = 2;
+        $this->oneMID=5;//0-9  小于6的为小
+        $this->sumMID=14;// 和值为0-27   小于14的为小
+
+        ////开奖时间，09:05:00~~23:55:00    (实际在09:06:30左右抓到数据)
+        ////计划于09:06:00进入访问，下方的开奖时间要比计划任务设定的早一点
+        $this->nowTime=strtotime(date("Y-m-d H:i:s"));
+        $this->kjTime=strtotime(date("Y-m-d")." 09:05:50");
+        $this->jsTime=strtotime(date("Y-m-d")." 23:59:59");
+
+        $this->cookiePath=$dir."/cookie.txt";
+        if ($isLuck) {
+            $this->cookiePath=$dir."/cookieIsLuck.txt";
+        }
+        $this->api = 'https://www.ezun889.com/lottery/commonLottery/getRecent5Records.html?code=xy28';
+        if ($isLuck) {
+            $this->api = 'https://luck.sdtiop.com/hall/pc/lottery/get-recent-close-expect.html?code=xy28';
+        }
+        $this->referURL='https://www.ezun889.com/lottery/pk10/xyft/index.html';
+        if ($isLuck) {
+            $this->referURL='https://luck.sdtiop.com/open1/index.html';
+        }
+        $this->Host='www.ezun889.com';
+        if ($isLuck) {
+            $this->Host='luck.sdtiop.com';
+        }
+
+        $this->cookieStr="_ga=GA1.2.1122988726.1547700251; _LANGUAGE=zh_CN; isAutoPay=true; BALANCE_HIDE=false; REFRESH_BALANCE_TIME=0; _gid=GA1.2.985156283.1562824143; ACCESS_TERMINAL=pc; SID=kfdmQlcXjBs02+BvtvNwCgaE0doAbLWyWwYH3hxovwaBwa2snEz/fHJ+FtxhLEz/LT5/4borO4XwGTAkwoyhUw==; UID=jlhtznre; _gat_gtag_UA_122667432_2=1; route=b69869a777c0b504c19cab11c578637a";
         
-            if ($opencode==null) {
-                echo "<br>--opencode--null----";
-                return false;
-            }
-         
-            // $opencode = implode(",", $array_opencode);
-            // $open_time = date('Y-m-d H:i:s', ($json[0]->open_date)/1000);
-            $open_time = $json[0]->fmOpenTime;
-            $json_new=(object)array("data"=>array((object)array("expect"=>$expect,"opencode"=>$opencode,"opentime"=>$open_time)));
-            $json=$json_new;
-            $result=json_encode($json);
-      
-            $expect=$json->data[0]->expect;
-              
-      
+        $this->log("<br> __construct___ getCookie() ___  \n");
+        $this->getCookie();
    
-            $file_name=$expect;
-            $str=$result;
-   
-            $t=$json->data[0]->opentime;
-            $opentime=strtotime($t);
-            $today=date("Y-m-d")." 00:00:00";
-            $today=strtotime($today);
+        if ($this->nowTime>$this->kjTime||$this->nowTime<$this->jsTime) {
+            $startTime = microtime(true);
+            $endTime = microtime(true);
+            $runTime = $endTime-$startTime;
 
-            if ($opentime>$today) {
-                return add($file_name, $str);
-            }
-        } elseif (gettype($json)=="object") {
-            //{"error":0,"data":{"openCodeMemo":null,"expect":"937614","openCode":"8,9,5","openTime":1550913000000}}
-            if (property_exists($json, "data")) {
-                $data__=$json->data;
+            do {
+                $api_statu=$this->getApi();
 
-                if (gettype($json->data)=="array") {
-                    $data__=$json->data[0];
-                }
-                $expect=$data__->expect;
-                $opencode=$data__->openCode;
-                $open_time = date('Y-m-d H:i:s', ($data__->openTime)/1000);
-                ;
-                //  var_dump($expect);
-                if ($opencode==null) {
-                    echo "<br>--opencode--null----";
+                sleep($this->loopInterval);
+
+                $endTime = microtime(true);
+                $runTime = $endTime-$startTime;
+
+                $m=gmstrftime('%M:%S', $runTime);
+                $this->log("<br>--runTime=".$m." --".$runTime."--\n");
+            } while ($runTime<$this->kjInterval && !$api_statu && !$isTEST);
+        } else {
+            $this->log("<br> __reset___ getCookie() ___  \n");;
+            $this->getApi();//刷新cookie
+        }
+    }
+
+    public function getApi()
+    {
+        $result = $this->getHtml();
+        $json=json_decode($result);
+        //  var_dump($json);
+        //  return;
+        if ($json!=null) {
+            if (gettype($json)=="array") {
+                //https://www.ezun889.com/lottery/pk10/xyft/index.html
+                if (count($json)<=0) {
+                    $this->log("<br> __".$result."___  \n");
                     return false;
                 }
-                // $opencode = implode(",", $array_opencode);
-                // $open_time = date('Y-m-d H:i:s', ($json[0]->open_date)/1000);
-
+                // usort($json, function ($a, $b) { 排序
+                //     return -strcmp($a->IssueNumber, $b->IssueNumber);
+                // });
+                //[{"id":3438390,"expect":"20190711104","code":"xyft","type":"pk10","openCode":null,
+                //      "openTime":1562852680000,"closeTime":1562852620000,"openingTime":1562852320000,
+                //      "gatherTime":null,"origin":null,"date":null,"advanceOpen":false,"orderNum":null,
+                //       "fmOpenTime":"2019-07-11 21:44:40","codeMemo":"幸运飞艇","leftTime":0,"leftOpenTime":0}]
+                $expect=$json[0]->expect;
+                $opencode=$json[0]->openCode;
+                $open_time=$json[0]->fmOpenTime;//date("Y-m-d H:i:s");
+                if ($opencode==null) {
+                    $this->log("<br>--opencode--null---- \n");
+                    return false;
+                }
+                // $open_Date=$json[0]->Date;
+    
                 //开奖号码转为数组
                 $array_opencode=explode(",", $opencode);
-                //计算和值
-                $opencode_sum = array_sum($array_opencode);
-                //计算和值大小getSize
-                $opencode_size=getSize($opencode_sum);
-                //计算和值单双getSize
-                $opencode_oddOrEven=getOddOrEven($opencode_sum);
-                //计算和值色波getSize
-                $opencode_color=getColor($opencode_sum);
+                /////////////////////////////////////////////
+                //////////////// 开始 玩法 ///////////////////
+                /////////////////////////////////////////////
+                // //定位胆
+                $str1=$opencode;
+                // //大小定位  1、2、3、4、5时为“小”
+                // $str2=$this->getSize($array_opencode[0], $this->oneMID).","
+                //     .$this->getSize($array_opencode[1], $this->oneMID).","
+                //     .$this->getSize($array_opencode[2], $this->oneMID).","
+                //     .$this->getSize($array_opencode[3], $this->oneMID).","
+                //     .$this->getSize($array_opencode[4], $this->oneMID);
+                // //单双定位
+                // $str3=$this->getOddOrEven($array_opencode[0]).","
+                //     .$this->getOddOrEven($array_opencode[1]).","
+                //     .$this->getOddOrEven($array_opencode[2]).","
+                //     .$this->getOddOrEven($array_opencode[3]).","
+                //     .$this->getOddOrEven($array_opencode[4]);
 
-                $sumStr=$opencode_sum.",".$opencode_size.",".$opencode_oddOrEven.",".$opencode_size.$opencode_oddOrEven.",".$opencode_color;
-  
-                $opencode=$opencode."|||".$sumStr;
+                // //冠亚和   1-10  和 和值为3-19
+                // $opencode_sum = $array_opencode[0]+$array_opencode[1];
+                // $hzdx=$this->getSumSize($opencode_sum, $this->sumMID);//和值大小  小值为3-11
+                // $hzds=$this->getOddOrEven($opencode_sum); //和值单双
+                // $str4=$hzdx.",".$hzds.",".$hzdx.$hzds;
+                // 和值
+                $opencode_sum = array_sum($array_opencode);//特码
+                $hzdx=$this->getSumSize($opencode_sum, $this->sumMID);//和值大小
+                $hzds=$this->getOddOrEven($opencode_sum); //和值单双
+                $hzsb=$this->getColor($opencode_sum); //和值色波
+                $str2=$opencode_sum.",".$hzdx.",".$hzds.",".$hzdx.$hzds.",".$hzsb;
+                // //龙虎和  以开奖结果的万位和个位作为基准，取万为龙，个为虎的数字进行大小比对的一种玩法
+                // $str5=$this->getDragonOrTiger($array_opencode[0], $array_opencode[4]);
+                // //五星定胆
+                // $str6=implode("||", $array_opencode);
+                // //组三
+                // $str7=$this->getABB($array_opencode[0], $array_opencode[1], $array_opencode[2]).","
+                //     .$this->getABB($array_opencode[1], $array_opencode[2], $array_opencode[3]).","
+                //     .$this->getABB($array_opencode[2], $array_opencode[3], $array_opencode[4]);
+                // //组六
+                // $str8=$this->getABC($array_opencode[0], $array_opencode[1], $array_opencode[2]).","
+                //     .$this->getABC($array_opencode[1], $array_opencode[2], $array_opencode[3]).","
+                //     .$this->getABC($array_opencode[2], $array_opencode[3], $array_opencode[4]);
+
+                $opencode = $str1."|||".$str2;
+
+                /////////////////////////////////////////////
+                //////////////// 结束 玩法 ///////////////////
+                /////////////////////////////////////////////
 
                 $json_new=(object)array("data"=>array((object)array("expect"=>$expect,"opencode"=>$opencode,"opentime"=>$open_time)));
                 $json=$json_new;
                 $result=json_encode($json);
-     
+          
                 $expect=$json->data[0]->expect;
-             
-  
+                  
                 $file_name=$expect;
                 $str=$result;
-  
-                $t=$json->data[0]->opentime;
-                $opentime=strtotime($t);
-                $today=date("Y-m-d")." 00:00:00";
-                $today=strtotime($today);
+       
+                $openDate=strtotime(substr($expect, 0, 8)."000001");
+                $today=strtotime(date("Y-m-d")." 00:00:00");
+                //{"data":[{"expect":"20190710170","opencode":"07,01,04,10,05,06,08,09,02,03","opentime":"2019-07-11 03:14:40"}]}
+                // 开奖  13：09-00:00-次日04：04
 
-                if ($opentime>$today) {
-                    return add($file_name, $str);
+                if ($this->nowTime>$this->jsTime && $openDate<$today) {//开奖结束之后，不再写入昨天的开奖
+                    return false;
                 }
-            } else {
-                var_dump($json);
+                return $this->add($file_name, $str);
+            } elseif (gettype($json)=="object") {
+                //https://luck.sdtiop.com/hall/pc/lottery/get-recent-close-expect.html?code=xyft
+                //{"error":0,"data":{"openCodeMemo":null,"expect":"20190711107","openCode":"03,08,07,02,01,09,10,06,04,05","openTime":1562853580000}}
+                if (property_exists($json, "data")) {
+                    $data__=$json->data;
+    
+                    if (gettype($json->data)=="array") {
+                        $data__=$json->data[0];
+                    }
+                    $expect=$data__->expect;
+                    $opencode=$data__->openCode;
+                    $open_time = date('Y-m-d H:i:s', ($data__->openTime)/1000);
+
+                    if ($opencode==null) {
+                        $this->log("<br>--opencode--null----\n");
+                        return false;
+                    }
+
+                    //开奖号码转为数组
+                    $array_opencode=explode(",", $opencode);
+                    /////////////////////////////////////////////
+                    //////////////// 开始 玩法 ///////////////////
+                    /////////////////////////////////////////////
+                    // //定位胆
+                    $str1=$opencode;
+                    // //大小定位  1、2、3、4、5时为“小”
+                    // $str2=$this->getSize($array_opencode[0], $this->oneMID).","
+                    //     .$this->getSize($array_opencode[1], $this->oneMID).","
+                    //     .$this->getSize($array_opencode[2], $this->oneMID).","
+                    //     .$this->getSize($array_opencode[3], $this->oneMID).","
+                    //     .$this->getSize($array_opencode[4], $this->oneMID);
+                    // //单双定位
+                    // $str3=$this->getOddOrEven($array_opencode[0]).","
+                    //     .$this->getOddOrEven($array_opencode[1]).","
+                    //     .$this->getOddOrEven($array_opencode[2]).","
+                    //     .$this->getOddOrEven($array_opencode[3]).","
+                    //     .$this->getOddOrEven($array_opencode[4]);
+
+                    // //冠亚和   1-10  和 和值为3-19
+                // $opencode_sum = $array_opencode[0]+$array_opencode[1];
+                // $hzdx=$this->getSumSize($opencode_sum, $this->sumMID);//和值大小  小值为3-11
+                // $hzds=$this->getOddOrEven($opencode_sum); //和值单双
+                // $str4=$hzdx.",".$hzds.",".$hzdx.$hzds;
+                // 和值
+                $opencode_sum = array_sum($array_opencode);//特码
+                $hzdx=$this->getSumSize($opencode_sum, $this->sumMID);//和值大小
+                $hzds=$this->getOddOrEven($opencode_sum); //和值单双
+                $hzsb=$this->getColor($opencode_sum); //和值色波
+                $str2=$opencode_sum.",".$hzdx.",".$hzds.",".$hzdx.$hzds.",".$hzsb;
+                    // //龙虎和  以开奖结果的万位和个位作为基准，取万为龙，个为虎的数字进行大小比对的一种玩法
+                    // $str5=$this->getDragonOrTiger($array_opencode[0], $array_opencode[4]);
+                    // //五星定胆
+                    // $str6=implode("||", $array_opencode);
+                    // //组三
+                    // $str7=$this->getABB($array_opencode[0], $array_opencode[1], $array_opencode[2]).","
+                    //     .$this->getABB($array_opencode[1], $array_opencode[2], $array_opencode[3]).","
+                    //     .$this->getABB($array_opencode[2], $array_opencode[3], $array_opencode[4]);
+                    // //组六
+                    // $str8=$this->getABC($array_opencode[0], $array_opencode[1], $array_opencode[2]).","
+                    //     .$this->getABC($array_opencode[1], $array_opencode[2], $array_opencode[3]).","
+                    //     .$this->getABC($array_opencode[2], $array_opencode[3], $array_opencode[4]);
+
+                    $opencode = $str1."|||".$str2;
+
+                    /////////////////////////////////////////////
+                    //////////////// 结束 玩法 ///////////////////
+                    /////////////////////////////////////////////
+
+                    $json_new=(object)array("data"=>array((object)array("expect"=>$expect,"opencode"=>$opencode,"opentime"=>$open_time)));
+                    $json=$json_new;
+                    $result=json_encode($json);
+         
+                    $expect=$json->data[0]->expect;
+                    $file_name=$expect;
+                    $str=$result;
+      
+
+                    $openDate=strtotime(substr($expect, 0, 8)."000001");
+                    $today=strtotime(date("Y-m-d")." 00:00:00");
+                    //{"data":[{"expect":"20190710170","opencode":"07,01,04,10,05,06,08,09,02,03","opentime":"2019-07-11 03:14:40"}]}
+                    // 开奖  13：09-00:00-次日04：04
+    
+                    if ($this->nowTime>$this->jsTime && $openDate<$today) {//开奖结束之后，不再写入昨天的开奖
+                        return false;
+                    }
+
+                    // $t=$json->data[0]->opentime;
+                    // $opentime=strtotime($t);
+                    // $today=date("Y-m-d")." 00:00:00";
+                    // $today=strtotime($today);
+    
+                    // if ($this->nowTime>$this->kjTime && $opentime<$today) {//9点之后，不再写入昨天的开奖
+                    //     return false;
+                    // }
+                    return $this->add($file_name, $str);
+                } else {
+                    var_dump($json);
+                    return false;
+                }
             }
-        }
-    };
-}
-function getSize($n)
-{
-    if ($n<14) {
-        return "小";
-    } else {
-        return "大";
-    }
-};
-function getOddOrEven($n)
-{
-    if ((abs($n)+2)%2==1) {
-        return "单";
-    } else {
-        return "双";
-    }
-};
-function getColor($n)
-{
-    if ((abs($n)+3)%3==1) {
-        return "绿";
-    } elseif ((abs($n)+3)%3==2) {
-        return "蓝";
-    } else {
-        return "红";
-    }
-};
-function add($file_name, $str)
-{
-
-//echo '<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="utf-8"><title>*setTime</title></head><body>';
-
-    //echo '<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="utf-8"><title>*setTime</title></head><body>';
-
-    $mk_dir="txt-kj";
-  
-    
-    $mk_day=date("Ymd");
-
-    //����ʱ�䣬13:09~~ ���� 04��04
-
-    $nowtime=date("Y-m-d H:i:s");
-    $firstTime=date("Y-m-d")." 09:00:00";
-
-    if (strtotime($nowtime)<strtotime($firstTime)) {
-        $mk_day=date("Ymd", strtotime("-1 day"));
-    }
-
-    //$file_name=date("Ymd");
-
-    $file_type="txt";
-    
-
-    $path=$mk_dir."/".$mk_day."/".$file_name.".".$file_type;
-
-    echo $path."-------";
-
-    if (!file_exists($mk_dir)) {
-        mkdir($mk_dir);
-    }
-
-    if (!file_exists($mk_dir."/".$mk_day)) {
-        mkdir($mk_dir."/".$mk_day);
+        } else {
+            $this->log("<br> --json==null--- result=".$result." -------\n");
+        };
     }
 
 
-    if (!file_exists($path)) {
-
-   // $str = $file_name;
-
-        file_put_contents($path, $str);
-
-        echo "create succse \n";
-        return true;
-    } else {
-        echo "create false \n";
-
-        return false;
-    }
-}
-
-
-function getHtml($url)
-{
-
-    //$html=file_get_contents($So360);
-    // $useragent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36';
-    $timeout= 120;
-    $dir            = dirname(__FILE__);
-    $cookie_file    = $dir . '/cookies/' . md5($_SERVER['REMOTE_ADDR']) . '.txt';
-    $refer_url_array = [
-        'ezun88'  => 'https://www.ezun889.com/lottery/pk10/jspk10/index.html',
-        'ezgj999' => 'http://www.ezgj999.com/lottery/pk10/jspk10/index.html',
-        'ezgj666' => 'http://www.ezgj666.com/lottery/pk10/jspk10/index.html'
-    ];
-    $agent_array=[
+    //get 方式
+    public function getHtml()
+    {
+        $url=$this->api;
+        //$html=file_get_contents($So360);
+        // $useragent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.89 Safari/537.36';
+        $timeout= 120;
+        $dir            = dirname(__FILE__);
+        $cookie_file    = $dir . '/cookie_file_getHTML.txt';
+        $refer_url_array = [
+        'ezun88'  => $this->referURL
+        ];
+        $agent_array=[
         //PC�˵�UserAgent
         "safari 5.1 �C MAC"=>"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
         "safari 5.1 �C Windows"=>"Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
@@ -268,7 +345,7 @@ function getHtml($url)
         "safari5.0"=>"Mozilla/5.0 (iPhone; U; CPU like Mac OS X) AppleWebKit/420.1 (KHTML, like Gecko) Version/3.0 Mobile/4A93 Safari/419.3",
         'google5.0' => 'Mozilla/5.0 (Windows; U; Windows NT 5.2) AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.27 Safari/525.13'
     ];
-    $ip_long = array(
+        $ip_long = array(
         array('607649792', '608174079'), //36.56.0.0-36.63.255.255
         array('1038614528', '1039007743'), //61.232.0.0-61.237.255.255
         array('1783627776', '1784676351'), //106.80.0.0-106.95.255.255
@@ -280,38 +357,259 @@ function getHtml($url)
         array('-770113536', '-768606209'), //210.25.0.0-210.47.255.255
         array('-569376768', '-564133889'), //222.16.0.0-222.95.255.255
     );
-    $rand_key = mt_rand(0, 9);
-    $ip= long2ip(mt_rand($ip_long[$rand_key][0], $ip_long[$rand_key][1]));//
-    $header = array(
+        $rand_key = mt_rand(0, 9);
+        $ip= long2ip(mt_rand($ip_long[$rand_key][0], $ip_long[$rand_key][1]));//
+        $header = array(
         'CLIENT-IP:'.$ip,
         'X-FORWARDED-FOR:'.$ip,
+        'Host:'.$this->Host,
+        'Connection:keep-alive',
+        'Cookie:'.$this->getCookie()
     );    //����ip
     $useragent=$agent_array[array_rand($agent_array, 1)];//��������
     $referurl = $refer_url_array[array_rand($refer_url_array, 1)];  //�����Դ��ַreferurl
 
   //  $header = array("Connection: Keep-Alive","Accept: text/html, application/xhtml+xml, */*", "Pragma: no-cache", "Accept-Language: zh-Hans-CN,zh-Hans;q=0.8,en-US;q=0.5,en;q=0.3","User-Agent: Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)",'CLIENT-IP:'.$ip,'X-FORWARDED-FOR:'.$ip);
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_FAILONERROR, true);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
-    curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_ENCODING, "");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_FAILONERROR, true);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie_file);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_ENCODING, "");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-    curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
-    curl_setopt($ch, CURLOPT_REFERER, $referurl);
-    $html = curl_exec($ch);
-    if (curl_errno($ch)) {
-        return 'error:' . curl_error($ch);
-    }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+        curl_setopt($ch, CURLOPT_REFERER, $referurl);
+
+        // 关闭SSL验证
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        $html = curl_exec($ch);
+        if (curl_errno($ch)) {
+            return 'error:' . curl_error($ch);
+        }
  
-    curl_close($ch);
-    return $html;
+        $info = curl_getinfo($ch);
+    
+        $httpHeaderSize = $info['header_size'];  //header字符串体积
+    $pHeader = substr($html, 0, $httpHeaderSize); //获得header字符串
+    $pRes = substr($html, $httpHeaderSize); //获得 返回值 字符串
+    $pHeader = $this->http_header_to_arr($pHeader);
+        if (isset($pHeader["Set-Cookie"])) {
+            $this->addCookie($pHeader["Set-Cookie"]);
+        }
+
+        curl_close($ch);
+        return $html;
+    }
+
+
+
+
+
+    public function http_header_to_arr($header_str)
+    {
+        $header_list = explode("\n", $header_str);
+        $header_arr = [];
+        foreach ($header_list as $key => $value) {
+            if (strpos($value, ':') === false) {
+                continue;
+            }
+            list($header_key, $header_value) = explode(":", $value, 2);
+            $header_arr[$header_key] = trim($header_value);
+        }
+        if (isset($header_arr['Content-MD5'])) {
+            $header_arr['md5'] = bin2hex(base64_decode($header_arr['Content-MD5']));
+        }
+        return $header_arr;
+    }
+
+    public function addCookie($str)
+    {
+        file_put_contents($this->cookiePath, $str);
+    }
+    public function getCookie()
+    {
+        if (!file_exists($this->cookiePath)) {
+            file_put_contents($this->cookiePath, '');
+        }
+        $contents = file_get_contents($this->cookiePath);
+
+        if (strlen($contents)<10) {
+            $this->addCookie($this->cookieStr);
+            $this->log("<br>--getCookie:  no old add temp_cookie--\n");
+        } else {
+            $this->cookieStr=$contents;
+            $this->log("<br>--getCookie:  had old SESSION_cookie--\n");
+        }
+        
+        return  $this->cookieStr;
+    }
+
+    
+    
+
+    public function array_is_same($arr)
+    {
+        $l=count($arr);
+        for ($i = 1; $i < $l; $i++) {
+            if ($arr[$i] !== $arr[0]) {
+                return false;
+            }
+        }
+    
+        return true;
+    }
+    public function getSize($n, $mid)
+    {
+        if ($n<$mid) {
+            return "小";
+        } else {
+            return "大";
+        }
+    }
+    public function getSumSize($sum, $mid)
+    {
+        if ($sum<$mid) {
+            return "小";
+        } else {
+            return "大";
+        }
+    }
+    public function getOddOrEven($n)
+    {
+        if ((abs($n)+2)%2==1) {
+            return "单";
+        } else {
+            return "双";
+        }
+    }
+    public function getDragonOrTiger($dragon, $tiger)
+    {
+        if ($dragon>$tiger) {
+            return "龙";
+        } elseif ($dragon<$tiger) {
+            return "虎";
+        } else {
+            return "和";
+        }
+    }
+    public function getColor($n)
+    {
+        if ((abs($n)+3)%3==1) {
+            return "绿";
+        } elseif ((abs($n)+3)%3==2) {
+            return "蓝";
+        } else {
+            return "红";
+        }
+    }
+    public function getABB($a, $b, $c)
+    {
+        if ($a==$b&&$b==$c) {
+            return "err";//豹子
+        }
+        if ($a==$b) {
+            return $b."&&".$c;//组三
+        }
+        if ($b==$c) {
+            return $a."&&".$c;//组三
+        }
+        if ($a==$c) {
+            return $a."&&".$b;//组三
+        }
+        return "err";//组六
+    }
+    public function getABC($a, $b, $c)
+    {
+        if ($a==$b&&$b==$c) {
+            return "err";//豹子
+        }
+        if ($a==$b||$b==$c||$a==$c) {
+            return "err";//组三
+        }
+        return $a."&&".$b."&&".$c;//组六
+    }
+    public function add($file_name, $str)
+    {
+        $this->log("<br>--try to add the result--\n");
+
+
+        $mk_dir=dirname(__FILE__)."/txt-kj";
+  
+    
+        $mk_day=date("Ymd");
+
+
+        //{"data":[{"expect":"20190710170","opencode":"07,01,04,10,05,06,08,09,02,03","opentime":"2019-07-11 03:14:40"}]}
+        // 开奖  13：09-00:00-次日04：04
+
+        //   if ($this->nowTime>$this->jsTime && $openDate<$today) {//开奖结束之后，不再写入昨天的开奖
+        //     return false;
+        // }
+
+        if ($this->nowTime < $this->kjTime) {
+            $this->log("<br>--".date('Y-m-d H:i:s', $this->nowTime)."<".date('Y-m-d H:i:s', $this->kjTime)." todo -1 day--\n");
+
+
+            $mk_day=date("Ymd", strtotime("-1 day"));
+        }
+
+        //$file_name=date("Ymd");
+
+        $file_type="txt";
+        
+
+        $path=$mk_dir."/".$mk_day."/".$file_name.".".$file_type;
+
+        $this->log("<br>--".$path."--\n");
+
+        if (!file_exists($mk_dir)) {
+            mkdir($mk_dir);
+        }
+
+        if (!file_exists($mk_dir."/".$mk_day)) {
+            mkdir($mk_dir."/".$mk_day);
+        }
+
+
+        if (!file_exists($path)) {
+
+       // $str = $file_name;
+
+            file_put_contents($path, $str);
+
+            $this->log("<br>-- ****** create succse ****** --\n");
+            return true;
+        } else {
+            $this->log("<br>--create false--\n");
+
+            return false;
+        }
+    }
+    public function log($str)
+    {
+        echo $str;
+        $mk_dir=dirname(dirname(__FILE__))."/__________log__________";
+        if (!file_exists($mk_dir)) {
+            mkdir($mk_dir);
+        }
+        $mk_dir.="/".substr(explode('.', basename(__FILE__))[0],4,-3);
+        if (!file_exists($mk_dir)) {
+            mkdir($mk_dir);
+        }
+        $path=$mk_dir."/".date("Ymd").".txt";
+        $str=date('Y-m-d H:i:s')."__".$str.PHP_EOL;
+        file_put_contents($path, $str, FILE_APPEND);
+    }
 }
+
+
+new vrsxffc();

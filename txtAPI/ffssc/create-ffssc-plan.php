@@ -4,9 +4,9 @@ date_default_timezone_set("Asia/Chongqing");
 
 echo '<meta http-equiv="content-type" content="text/html;charset=utf-8">';
 
+//[{"name":"定位胆","item":[{"name":"万位","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"千位","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"百位","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"十位","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"个位","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]}]},{"name":"大小定位","item":[{"name":"万位","item":[{"name":"一码","item":1}]},{"name":"千位","item":[{"name":"一码","item":1}]},{"name":"百位","item":[{"name":"一码","item":1}]},{"name":"十位","item":[{"name":"一码","item":1}]},{"name":"个位","item":[{"name":"一码","item":1}]}]},{"name":"单双定位","item":[{"name":"万位","item":[{"name":"一码","item":1}]},{"name":"千位","item":[{"name":"一码","item":1}]},{"name":"百位","item":[{"name":"一码","item":1}]},{"name":"十位","item":[{"name":"一码","item":1}]},{"name":"个位","item":[{"name":"一码","item":1}]}]},{"name":"和值","item":[{"name":"大小","item":[{"name":"四码","item":4}]},{"name":"单双","item":[{"name":"一码","item":1}]},{"name":"大小单双","item":[{"name":"一码","item":1}]}]},{"name":"五星","item":[{"name":"定胆","item":[{"name":"一码","item":1}]}]},{"name":"组三","item":[{"name":"前三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"中三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"后三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]}]},{"name":"组六","item":[{"name":"前三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"中三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"后三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]}]}]
 
-
-$str='[{"name":"定位胆","item":[{"name":"万","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"千","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"百","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"十","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"个","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]}]},{"name":"大小定位","item":[{"name":"万","item":[{"name":"一码","item":1}]},{"name":"千","item":[{"name":"一码","item":1}]},{"name":"百","item":[{"name":"一码","item":1}]},{"name":"十","item":[{"name":"一码","item":1}]},{"name":"个","item":[{"name":"一码","item":1}]}]},{"name":"单双定位","item":[{"name":"万","item":[{"name":"一码","item":1}]},{"name":"千","item":[{"name":"一码","item":1}]},{"name":"百","item":[{"name":"一码","item":1}]},{"name":"十","item":[{"name":"一码","item":1}]},{"name":"个","item":[{"name":"一码","item":1}]}]},{"name":"和值","item":[{"name":"大小","item":[{"name":"四码","item":4}]},{"name":"单双","item":[{"name":"一码","item":1}]},{"name":"大小单双","item":[{"name":"一码","item":1}]}]},{"name":"五星","item":[{"name":"定胆","item":[{"name":"一码","item":1}]}]},{"name":"组三","item":[{"name":"前三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"中三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"后三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]}]},{"name":"组六","item":[{"name":"前三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"中三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"后三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]}]}]';
+$str='[{"name":"定位胆","item":[{"name":"万","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"千","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"百","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"十","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]},{"name":"个","item":[{"name":"四码","item":4},{"name":"五码","item":5},{"name":"六码","item":6},{"name":"七码","item":7}]}]},{"name":"大小定位","item":[{"name":"万","item":[{"name":"一码","item":1}]},{"name":"千","item":[{"name":"一码","item":1}]},{"name":"百","item":[{"name":"一码","item":1}]},{"name":"十","item":[{"name":"一码","item":1}]},{"name":"个","item":[{"name":"一码","item":1}]}]},{"name":"单双定位","item":[{"name":"万","item":[{"name":"一码","item":1}]},{"name":"千","item":[{"name":"一码","item":1}]},{"name":"百","item":[{"name":"一码","item":1}]},{"name":"十","item":[{"name":"一码","item":1}]},{"name":"个","item":[{"name":"一码","item":1}]}]},{"name":"和值","item":[{"name":"大小","item":[{"name":"四码","item":4}]},{"name":"单双","item":[{"name":"一码","item":1}]},{"name":"大小单双","item":[{"name":"一码","item":1}]}]},{"name":"龙虎","item":[{"name":"万个","item":[{"name":"一码","item":1}]}]},{"name":"五星","item":[{"name":"定胆","item":[{"name":"一码","item":1}]}]},{"name":"组三","item":[{"name":"前三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"中三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"后三","item":[{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]}]},{"name":"组六","item":[{"name":"前三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"中三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]},{"name":"后三","item":[{"name":"六码","item":6},{"name":"七码","item":7},{"name":"八码","item":8},{"name":"九码","item":9}]}]}]';
 
 $arr=json_decode($str);
 
@@ -17,6 +17,9 @@ $positon_="";
 $numbers_="";
 $pk10 = '0123456789';
 $pk10_ar = str_split($pk10);
+
+$oneMID=5;//0-9  小于5的为小
+$sumMID=23;// 5位数，0~9，和值为0~45，小值为0-22   小于23的为小
 
 $len1=count($arr);
 for($x=1;$x<=50;$x++) { //100个计划
@@ -58,22 +61,25 @@ for($x=1;$x<=50;$x++) { //100个计划
                                                 $random_pk10_qi = implode(",", $pk10_ar_plan);
                         break;
                         case "大小定位":
-                            $random_pk10_qi = getSize($random_one);
+                            $random_pk10_qi = getSize($random_one,$oneMID);
                         break;
                         case "单双定位":
                             $random_pk10_qi = getOddOrEven($random_one);
+                        break;
+                        case "龙虎":
+                            $random_pk10_qi = getDragonOrTiger($random_one,mt_rand(0, 9));
                         break;
                         case "和值":
                       
                             switch($temp2[$x2]->name){
                                 case "大小":
-                                $random_pk10_qi=getSize($random_sum);
+                                $random_pk10_qi=getSize($random_sum,$sumMID);
                                 break;
                                 case "单双":
                                 $random_pk10_qi=getOddOrEven($random_sum);
                                 break;
                                 case "大小单双":
-                                $random_pk10_qi=getSize($random_sum).getOddOrEven($random_sum);
+                                $random_pk10_qi=getSize($random_sum,$sumMID).getOddOrEven($random_sum);
                                 break;
                             }
                         break;
@@ -118,7 +124,7 @@ function add($file_name, $str)
 
     $path=$mk_dir."/".$mk_day."/".$file_name.".".$file_type;
 
-    echo $path."-------";
+    echo "<br>--".$path."--\n";
 
     if (!file_exists($mk_dir)) {
         mkdir($mk_dir);
@@ -143,17 +149,9 @@ function add($file_name, $str)
         return false;
     }
 }
-function getSize($n)
+function getSize($n,$mid)
 {
-    if ($n<5) {
-        return "小";
-    } else {
-        return "大";
-    }
-};
-function getSumSize($n)
-{
-    if ($n<23) {
+    if ($n<$mid) {
         return "小";
     } else {
         return "大";
@@ -167,3 +165,13 @@ function getOddOrEven($n)
         return "双";
     }
 };
+function getDragonOrTiger($dragon, $tiger)
+{
+    if ($dragon>$tiger) {
+        return "龙";
+    } elseif ($dragon<$tiger) {
+        return "虎";
+    } else {
+        return "和";
+    }
+}
