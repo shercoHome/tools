@@ -8,20 +8,14 @@ require $fileTempMK.'allowOrigin.php';
 //打开当前目录下的目录pic下的子目录common。
 
 
-if(is_array($_GET)&&count($_GET)>0){
-
+if (is_array($_GET)&&count($_GET)>0) {
     if (isset($_GET["f"])) {
-
-        if(strlen($_GET["f"])>0){
-
-
-
-$myfile = fopen($_GET["f"], "r") or die("Unable to open file!");
-echo fgets($myfile);
+        if (strlen($_GET["f"])>0) {
+            $myfile = fopen($_GET["f"], "r") or die("Unable to open file!");
+            echo fgets($myfile);
 
 
-fclose($myfile);
-
-
-        }}}
-?>
+            fclose($myfile);
+        }
+    }
+}

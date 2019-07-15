@@ -124,7 +124,7 @@ function add($file_name, $str)
 
     $path=$mk_dir."/".$mk_day."/".$file_name.".".$file_type;
 
-    echo "<br>--".$path."--\n";
+    echo $path."-------";
 
     if (!file_exists($mk_dir)) {
         mkdir($mk_dir);

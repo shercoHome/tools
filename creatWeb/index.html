@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>SEO模板侠</title>
+  <link rel="stylesheet" href="/layui/css/layui.css">
+
+
+</head>
+
+<body>
+
+  <!-- 你的HTML代码 -->
+
+
+  <div id="layuiCollapse" class="layui-collapse" lay-filter="collapse" lay-accordion>
+
+    <div class="layui-colla-item">
+      <h2 class="layui-colla-title">每页随机字符,调用：{{ajian_random_数字_abc}}</h2>
+      <div class="layui-colla-content">
+        <ul>
+          <li>每一页的随机字符是一样的，不同页面是随机不同的字符</li>
+          <li>{{ajian_random_数字_abc}},中间的数字表示字符长度</li>
+          <li>{{ajian_random_abc}},没有数字时，默认长度为6</li>
+        </ul>
+      </div>
+    </div>
+    <div class="layui-colla-item">
+      <h2 class="layui-colla-title">每个随机字符,调用：{{ajian_true_random_数字_abc}}</h2>
+      <div class="layui-colla-content">
+        <ul>
+          <li>每一页的每一个字符都是随机的，真随机</li>
+          <li>{{ajian_true_random_数字_abc}},中间的数字表示字符长度</li>
+          <li>{{ajian_true_random_abc}},没有数字时，默认长度为6</li>
+        </ul>
+      </div>
+    </div>
+    <div class="layui-colla-item">
+      <h2 class="layui-colla-title">随机时间,调用：{{ajian_true_random_数字_datetime}}</h2>
+      <div class="layui-colla-content">
+        <ul>
+          <li>每一页的每一个时间都是随机的，真随机</li>
+          <li>{{ajian_true_random_数字_datetime}},中间的数字表示在最近几天内随机</li>
+          <li>{{ajian_true_random_abc}},没有数字时，默认随机最近7天内的时间</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <script>
+    var _html = '';
+    var _jsonArr = [
+      {
+        name: "顶级域名",
+        code: "ajian_domain"
+      }, {
+        name: "标题",
+        code: "ajian_title"
+      }, {
+        name: "企业",
+        code: "ajian_company"
+      }, {
+        name: "电话",
+        code: "ajian_tell"
+      }, {
+        name: "关键词1",
+        code: "ajian_random_keyword"
+      }, {
+        name: "关键词2",
+        code: "ajian_random_keyword2"
+      }, {
+        name: "关键词3",
+        code: "ajian_random_keyword3"
+      }, {
+        name: "关键词4",
+        code: "ajian_random_keyword4"
+      }, {
+        name: "关键词5",
+        code: "ajian_random_keyword5"
+      }
+    ];
+    _jsonArr.forEach((_json, index) => {
+
+      let _name = _json.name;
+      let _code = _json.code;
+      let _show = index == 0 ? 'layui-show' : '';
+      _html += '<div id="' + _code + '" class="layui-colla-item">';
+      _html += '  <h2 class="layui-colla-title">' + _name + ',调用：{{' + _code + '}}</h2>';
+      _html += '  <div class="layui-colla-content ' + _show + '">';
+      _html += '    <form class="layui-form" action="">';
+      _html += '      <div class="layui-form-item">';
+      _html += '        <label class="layui-form-label">调用方式</label>';
+      _html += '        <div class="layui-input-block">';
+      _html += '          <input id="' + _code + '_checkbox_random" type="checkbox" name="like[write]" title="随机调用">';
+      _html += '          <input id="' + _code + '_checkbox_unicode" type="checkbox" name="like[read]" title="Unicode转码">';
+      _html += '          <button id="' + _code + '_get" onclick="get(\'' + _code + '\')" type="button" class="layui-btn">刷新</button>';
+      _html += '          <button id="' + _code + '_save" onclick="save(\'' + _code + '\')" type="button" class="layui-btn layui-btn-normal">保存</button>';
+      _html += '        </div>';
+      _html += '      </div>';
+      _html += '    </form>';
+      _html += '    <textarea id="' + _code + '_textarea"></textarea>';
+      _html += '  </div>';
+      _html += ' </div>';
+    });
+    document.getElementById("layuiCollapse").innerHTML = _html + document.getElementById("layuiCollapse").innerHTML;
+    String.prototype.Trim = function () { return this.replace(/(^\s*)|(\s*$)/g, ""); }   // 去掉左右空格
+  </script>
+  <script src="/layui/layui.all.js"></script>
+  <script>
+    //由于模块都一次性加载,因此不用执行 layui.use() 来加载对应模块,直接使用即可：
+    var layer, $, form, element;
+    ; !function () {
+      layer = layui.layer;
+      form = layui.form;
+      element = layui.element;
+      $ = layui.$;
+
+      get('ajian_domain');
+      //layer.msg('Hello World');
+      //监听折叠
+      element.on('collapse(collapse)', function (data) {//data.show
+        if (data.show) {
+          let _id = data.title[0].parentElement.id;
+          if (_id == "") return;
+          // layer.msg('加载：' + _id);
+          get(_id);
+        }
+      });
+      form.on('checkbox', function (data) {
+        $(data.elem).attr('checked', data.elem.checked)
+      });
+    }();
+
+    function save(key) {
+      let _url = "list/" + key + ".txt";
+
+      let isRandom = $("#" + key + "_checkbox_random").attr('checked');
+      let isUnicode = $("#" + key + "_checkbox_unicode").attr('checked');
+
+      isRandom = isRandom ? "随机" : "固定"
+      isUnicode = isUnicode ? "转码" : "不转码"
+      let firstLine = isUnicode + "|" + isRandom
+      let _html = $("#" + key + "_textarea").val();
+      _html = firstLine + "\n" + _html;
+
+      // console.log(_html);
+
+
+      $.post("api.php", { type: "set", key: key, content: _html }, function (d) {
+        d = JSON.parse(d);
+
+        layer.msg(d.msg);
+        if (d.code != "1") {
+          return;
+        }
+
+      })
+    }
+
+    function get(key) {
+
+
+      $.post("api.php", { type: "get", key: key }, function (d) {
+        // console.log(d);
+
+
+        d = JSON.parse(d);
+        layer.msg(d.msg);
+        if (d.code != "1") {
+          return;
+        }
+
+        let data = d.data;
+        let arr = data.split("\n");
+        let delell = arr.shift();
+        let setting = delell.Trim().split("|");
+        let isRandom = setting[1] == "随机";
+        let isUnicode = setting[0] == "转码";
+        let txt = arr.join("\n");
+        // setting[1]=setting[1].split("");
+        // console.log(setting[1]);
+        $("#" + key + "_textarea").html(txt);
+        $("#" + key + "_checkbox_random").attr('checked', isRandom);
+        $("#" + key + "_checkbox_unicode").attr('checked', isUnicode);
+        form.render("checkbox");
+      })
+    }
+
+  </script>
+  <style>
+    textarea {
+      width: 92%;
+      margin: 0 4%;
+      min-height: 5em;
+    }
+  </style>
+</body>
+
+</html>
