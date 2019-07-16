@@ -1,3 +1,15 @@
+## 目录
+1. ZFB 支付宝转银行卡，自动提交表单
+2. creatWeb SEO 批量根据模板建站工具
+3. jpgascll
+4. site SEO 查询工具
+5. test
+5. vue-plan-api 接口
+6. wechatJump 微信、qq指导跳出到浏览器访问（top跳转到哪个网址   www.xxxx.cn ）
+7. wechatJump2 微信、qq指导跳出到浏览器访问
+8. wechatMP 微信用iframe打开网站，以便正常浏览已屏蔽的网站
+9. wwwroot creatWeb生成的网站
+
 ## Win2008系统+IIS7.0下安装SSL证书教程
 ### 申请免费SSL证书
 https://freessl.cn/
