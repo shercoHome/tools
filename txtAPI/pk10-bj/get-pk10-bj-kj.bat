@@ -1,1 +1,0 @@
-D:\Huweishen.com\PHPWEB\php\php.exe -q D:\history\api\pk10-bj\get-pk10-bj-kj.php

@@ -1,1 +1,0 @@
-D:\Huweishen.com\PHPWEB\php\php.exe -q D:\history\api\pk10-js\create-jspk10-plan.php

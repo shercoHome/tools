@@ -1,1 +1,0 @@
-D:\Huweishen.com\PHPWEB\php\php.exe -q D:\api_plan_data\jisk3-xy\create-jisk3-xy-plan.php

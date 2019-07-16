@@ -1,1 +1,0 @@
-D:\Huweishen.com\PHPWEB\php\php.exe -q D:\history\api\vr-sxffc\get-vrsxffc-kj.php

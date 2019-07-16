@@ -1,0 +1,1 @@
+D:\Huweishen.com\PHPWEB\php\php.exe -q D:\api_plan_data\xy-wf-pk10\kj-xy-wf-pk10.php

@@ -1,0 +1,1 @@
+D:\Huweishen.com\PHPWEB\php\php.exe -q D:\api_plan_data\lt-js-pk10\kj-lt-js-pk10.php

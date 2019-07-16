@@ -1,3 +1,13 @@
+## Win2008系统+IIS7.0下安装SSL证书教程
+### 申请免费SSL证书
+https://freessl.cn/
+
+### KeyManager 生成CSR
+https://keymanager.org/
+
+### IIS安装证书
+http://baijiahao.baidu.com/s?id=1601252392478469692
+
 ## 无法启动网站
 ### 除非 Windows Activation Service (WAS)和万维网发布服务(W3SVC)均处于运行状态，否则无法启动网站
 
