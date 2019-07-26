@@ -1,0 +1,1 @@
+D:\Huweishen.com\PHPWEB\php\php.exe -q D:\api_plan_data\vr-tx-ffc\jh-vr-tx-ffc.php

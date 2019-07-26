@@ -27,6 +27,7 @@ class WinRate
     private $authorize_msg;
     private $plan_dir;
     private $kj_dir;
+    private $_MKDAY_;
 
     //具有构造函数的类会在每次创建新对象时先调用此方法，所以非常适合在使用对象之前做一些初始化工作。
     public function __construct($info)
@@ -80,21 +81,21 @@ class WinRate
         }
 
 
-        $mk_day=date("Ymd");
+        $this->_MKDAY_=date("Ymd");
 
         /*
-         2019年7月15日 04:49:26  数据从getWinRates传入，不再判断 
+         2019年7月15日 04:49:26  数据从getWinRates传入，不再判断
          */
         if (array_key_exists('MKDAY', $info)) {
-            $mk_day=$info ['MKDAY'];
+            $this->_MKDAY_=$info ['MKDAY'];
         }
         
 
-        $this->plan_dir=$this->api."/txt-plan/".$mk_day;
-        $this->kj_dir=$this->api."/txt-kj/".$mk_day;
+        $this->plan_dir=$this->api."/txt-plan/".$this->_MKDAY_;
+        $this->kj_dir=$this->api."/txt-kj/".$this->_MKDAY_;
 
 
-        if (strpos($this->api,'||')===false) {
+        if (strpos($this->api, '||')===false) {
             $this->kj_history=$this->get_today_kj();
         }
     }
@@ -334,7 +335,23 @@ class WinRate
         $win_rate=(($p_r_c-$win_rate)/2+$win_rate)/$p_r_c;
 
         /////////////加入未开奖的///////////
-        $latest_one_plan=$plan_arr[$plan_ways][$plan__positon][$plan__numbers][$kj_c];
+        $_TODAY_QI_ = count($plan_arr[$plan_ways][$plan__positon][$plan__numbers]);
+        if ($kj_c>=$_TODAY_QI_) {
+            $_NEXT_DAY_=date("Ymd", strtotime("+1 day", strtotime($this->_MKDAY_)));
+            // echo "这是第二天的计划<br>";
+            $_NEXT_PLAN_FILE=$this->api."/txt-plan/".$_NEXT_DAY_."/".$plan__id.".txt";
+            $_NEXT_PLAN_STR=$this->get_file_content($_NEXT_PLAN_FILE);
+            $_NEXT_PLAN_ARR=json_decode($_NEXT_PLAN_STR);
+            $latest_one_plan=$_NEXT_PLAN_ARR[$plan_ways][$plan__positon][$plan__numbers][0];
+        //  $latest_one_plan=$plan_arr[$plan_ways][$plan__positon][$plan__numbers][$kj_c];
+        
+        } else {
+            $latest_one_plan=$plan_arr[$plan_ways][$plan__positon][$plan__numbers][$kj_c];
+        }
+
+
+
+       
         if ($mark!==0) {//计划未完成
         // $latest_one_plan=$plan_arr[$plan_positon][$plan_numbers][$kj_c-$markMark];
         // $markMark++;
@@ -369,7 +386,6 @@ class WinRate
     }
     public function get_today_kj($dir="")
     {
-
         if ($dir=="") {
             $dir=$this->kj_dir;
         }

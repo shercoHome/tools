@@ -259,7 +259,70 @@ class user
             
         return $flag;
     }
+    /**
+     * 查询并显示当天网站情况
+     * @param userinfo array('id'='',userName='');
+     * @param n 输出几条数据
+     * @return Boolean false 失败            
+     * @return Array  信息   成功 可能为空  注意：array()==false，返回true,即可判断有没有存在
+     * 
+     * return==false; //true 用户不存在（含false,array()空值）
+     * return!=false; //true 用户存在 array(有值)
+     */
+    public function websiteOverview($userinfo){
 
+        foreach ($userinfo as $key => $value) {
+            $userinfo[$key] = trim($value); //去掉用户内容后面的空格.
+        }
+
+        if (array_key_exists("agentID", $userinfo)) { 
+            $agentID=$userinfo ["agentID"]; 
+            $agent_finder_sql="agent.id = '$agentID'";
+        }
+        if (array_key_exists("agentName", $userinfo)) { 
+            $agentName=$userinfo ["agentName"]; 
+            $agent_finder_sql="agent.userName = '$agentName'";
+        }
+        
+        $flag=false;
+        // 创建连接
+        $conn = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
+        // 检测连接
+        if ($conn->connect_error) {
+            die("connect_error: " . $conn->connect_error);
+            return $flag;
+        }
+
+        $sql="SELECT * FROM(SELECT COUNT(u.id) AS register_all FROM USER agent, USER u WHERE 1 AND(u.agentDirect = agent.id OR u.agentTop = agent.id) AND ".$agent_finder_sql.") a,(SELECT COUNT(u.id) AS register_today FROM USER agent, USER u WHERE 1 AND(u.agentDirect = agent.id OR u.agentTop = agent.id) AND ".$agent_finder_sql." AND date(u.registerTime) = curdate()) b,(SELECT COUNT(u.id) AS register_yestoday FROM USER agent, USER u WHERE 1 AND(u.agentDirect = agent.id OR u.agentTop = agent.id) AND ".$agent_finder_sql." AND DATEDIFF(u.registerTime, NOW()) = -1) c,(SELECT COUNT(u.id) AS login_today FROM USER agent, USER u LEFT JOIN(SELECT aaaaaa. * FROM(SELECT * FROM logLogin ORDER BY loginTime DESC) aaaaaa GROUP BY aaaaaa.userID) l ON u.id = l.userID WHERE 1 AND(u.agentDirect = agent.id OR u.agentTop = agent.id) AND ".$agent_finder_sql." AND date(l.loginTokenTime) = curdate()) d,(SELECT COUNT(u.id) AS online_now FROM USER agent, websetting web, USER u LEFT JOIN(SELECT aaaaaa. * FROM(SELECT * FROM logLogin ORDER BY loginTime DESC) aaaaaa GROUP BY aaaaaa.userID) l ON u.id = l.userID WHERE 1 AND(u.agentDirect = agent.id OR u.agentTop = agent.id) AND agent.id = web.userID AND ".$agent_finder_sql." AND DATE_ADD(l.loginTokenTime, INTERVAL web.loginKeep MINUTE) >= now()) e";
+
+
+        if (array_key_exists("isAdmin", $userinfo)) { 
+           if( "1"==$userinfo ["isAdmin"]){
+            $sql="SELECT * FROM(SELECT COUNT(u.id) AS register_all FROM USER u WHERE 1) a,(SELECT COUNT(u.id) AS register_today FROM USER u WHERE 1 AND date(u.registerTime) = curdate()) b,(SELECT COUNT(u.id) AS register_yestoday FROM USER u WHERE 1 AND DATEDIFF(u.registerTime, NOW()) = -1) c,(SELECT COUNT(u.id) AS login_today FROM USER u LEFT JOIN(SELECT aaaaaa. * FROM(SELECT * FROM logLogin ORDER BY loginTime DESC) aaaaaa GROUP BY aaaaaa.userID) l ON u.id = l.userID WHERE 1 AND date(l.loginTokenTime) = curdate()) d,(SELECT COUNT(u.id) AS online_now FROM websetting web, USER u LEFT JOIN(SELECT aaaaaa. * FROM(SELECT * FROM logLogin ORDER BY loginTime DESC) aaaaaa GROUP BY aaaaaa.userID) l ON u.id = l.userID WHERE 1 AND u.agentDirect = web.userID AND DATE_ADD(l.loginTokenTime, INTERVAL web.loginKeep MINUTE) >= now()) e";
+           }
+        }
+
+
+    
+        $result = mysqli_query($conn, $sql);
+
+        if ($result===false) {
+            return false;
+        }
+        if ($result->num_rows > 0) {
+            // 输出数据
+            $arr=array();
+            while ($row = mysqli_fetch_assoc($result)) {
+                array_push($arr, $row);
+            }
+            $flag= $arr;
+        } else {
+            $flag=false;
+        }
+
+        $conn->close();
+        return $flag;
+    }
     /**
      * 查询并显示内容
      * @param userinfo array('id'='',userName='');

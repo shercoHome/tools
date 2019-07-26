@@ -1,6 +1,7 @@
 <?php
 date_default_timezone_set("Asia/Chongqing");
 echo '<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="utf-8">';
+echo "\n";
 define("DIR", dirname(__FILE__));
 define("FaDIR", dirname(dirname(__FILE__)));
 class Web
@@ -16,16 +17,18 @@ class Web
         $this->webIndex=0;
         $this->moban_temp="";
     }
-    public function CREATE_ALL_WEB(){
+    public function CREATE_ALL_WEB()
+    {
         $webConfig=$this->GET_TXT_LIST("ajian_domain"); // {{ajian_domain}} 顶级域名
         $__LISTS__=$webConfig["lists"];
         $__COUNT__=$webConfig["count"];
         for ($j=0;$j<$__COUNT__;$j++) {
             $__WEB__DOMAIN=trim($__LISTS__[$j]);
-            $this->CREATE_ONE_WEB($__WEB__DOMAIN,$j);
+            $this->CREATE_ONE_WEB($__WEB__DOMAIN, $j);
         }
     }
-    public function CREATE_ONE_WEB($__WEB__DOMAIN,$j){
+    public function CREATE_ONE_WEB($__WEB__DOMAIN, $j)
+    {
         $this->webIndex=$j;
         $__WEB__DOMAIN=trim($__WEB__DOMAIN);
 
@@ -39,17 +42,21 @@ class Web
             if ($type!="html"&&$type!="htm") {
                 if (!file_exists($this->web_dir."/".$__WEB__DOMAIN)) {
                     mkdir($this->web_dir."/".$__WEB__DOMAIN);
+                    echo "<br> ".$this->web_dir."/".$__WEB__DOMAIN." >>>>>> mkdir \n";
                 }
                 if (is_file($__TEMP__ONE__FULL__URL)) {
                     copy($__TEMP__ONE__FULL__URL, $__COPY_TO_FULL_URL);
+                    echo "<br> ".$__TEMP__ONE__FULL__URL." >>>>>> copy_FILE directly \n";
                 }
                 if (is_dir($__TEMP__ONE__FULL__URL)) {
                     $this->COPY_DIR($__TEMP__ONE__FULL__URL, $__COPY_TO_FULL_URL);
+                    echo "<br> ".$__TEMP__ONE__FULL__URL." >>>>>> COPY_DIR directly \n";
                 }
-                echo "<br> ".$__TEMP__ONE__FULL__URL." >>>>>> copy directly \n";
+               
                 continue;
             }
             $this->moban_temp = file_get_contents($__TEMP__ONE__FULL__URL);
+            $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_domain"));//域名
             $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_title"));//主关键词
             $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_company"));//企业名称
             $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_tell"));//qq和计划网址
@@ -64,44 +71,45 @@ class Web
             $this->CREATE_HTML($__WEB__DOMAIN, $__TEMP__ONE__NAME);
         }
         echo "<br> ".$__WEB__DOMAIN." >>>>>> webSite Create Success<br><hr> \n";
+        echo "<br> ___________________ \n";
     }
-    public function RANDOM_DATE($lastday=1,$begintime="", $endtime="") {  
-        $begin = $endtime == "" ?strtotime("-".$lastday." day") : strtotime($begintime);  
-        $end = $endtime == "" ?strtotime("now") : strtotime($endtime);  
-        $timestamp = rand($begin, $end);  
-        return date("Y-m-d H:i:s", $timestamp);  
+    public function RANDOM_DATE($lastday=1, $begintime="", $endtime="")
+    {
+        $begin = $endtime == "" ?strtotime("-".$lastday." day") : strtotime($begintime);
+        $end = $endtime == "" ?strtotime("now") : strtotime($endtime);
+        $timestamp = rand($begin, $end);
+        return date("Y-m-d H:i:s", $timestamp);
     }
     public function MOBAN_TEMP_ALLRANDOM_DATETIME()
     {//"/ajian(_true)?_random(\_?\d?)_abc/i",
-        $random_keyword_count=preg_match_all ("/{{ajian_true_random(\_?\d?)_datetime}}/", $this->moban_temp,$pat_array);
+        $random_keyword_count=preg_match_all("/{{ajian_true_random(\_?\d?)_datetime}}/", $this->moban_temp, $pat_array);
         for ($t = 0; $t < $random_keyword_count; $t++) {
             $__PREG__KEY__=$pat_array[0][$t];
             $__PREG__='/'.$__PREG__KEY__.'/';
             $__MATCH__=$pat_array[1][$t];
-            $num=$__MATCH__==""?7:substr($__MATCH__,1);
-            $this->moban_temp = preg_replace($__PREG__, $this->RANDOM_DATE($num),$this->moban_temp, 1);
+            $num=$__MATCH__==""?7:substr($__MATCH__, 1);
+            $this->moban_temp = preg_replace($__PREG__, $this->RANDOM_DATE($num), $this->moban_temp, 1);
         }
     }
     public function MOBAN_TEMP_ALLRANDOM_STRING()
     {//"/ajian(_true)?_random(\_?\d?)_abc/i",
-        $random_keyword_count=preg_match_all ("/{{ajian_true_random(\_?\d?)_abc}}/", $this->moban_temp,$pat_array);
+        $random_keyword_count=preg_match_all("/{{ajian_true_random(\_?\d?)_abc}}/", $this->moban_temp, $pat_array);
         for ($t = 0; $t < $random_keyword_count; $t++) {
             $__PREG__KEY__=$pat_array[0][$t];
             $__PREG__='/'.$__PREG__KEY__.'/';
             $__MATCH__=$pat_array[1][$t];
-            $num=$__MATCH__==""?6:substr($__MATCH__,1);
-            $this->moban_temp = preg_replace($__PREG__, $this->RANDOM_STRING($num),$this->moban_temp, 1);
+            $num=$__MATCH__==""?6:substr($__MATCH__, 1);
+            $this->moban_temp = preg_replace($__PREG__, $this->RANDOM_STRING($num), $this->moban_temp, 1);
         }
     }
     public function MOBAN_TEMP_RANDOM_STRING()
     {
-
-        $random_keyword_count=preg_match_all ("/{{ajian_random(\_?\d?)_abc}}/", $this->moban_temp,$pat_array);
+        $random_keyword_count=preg_match_all("/{{ajian_random(\_?\d?)_abc}}/", $this->moban_temp, $pat_array);
         for ($t = 0; $t < $random_keyword_count; $t++) {
             $__PREG__KEY__=$pat_array[0][$t];
             $__PREG__='/'.$__PREG__KEY__.'/';
             $__MATCH__=$pat_array[1][$t];
-            $num=$__MATCH__==""?6:substr($__MATCH__,1);
+            $num=$__MATCH__==""?6:substr($__MATCH__, 1);
             $this->moban_temp = preg_replace($__PREG__, $this->RANDOM_STRING($num), $this->moban_temp, -1);
         }
     }
@@ -110,7 +118,7 @@ class Web
         $__PREG__='/{{'.$txtArr["tempKey"].'}}/';
         $__LISTS__=$txtArr["lists"];
         if ($txtArr["toRandom"]) {
-            $__PREG__KEY__COUNT__=preg_match_all ($__PREG__, $this->moban_temp,$pat_array);
+            $__PREG__KEY__COUNT__=preg_match_all($__PREG__, $this->moban_temp, $pat_array);
             for ($t = 0; $t < $__PREG__KEY__COUNT__; $t++) {
                 $__WORD__=trim($this->V_ARRAY_RAND($__LISTS__));
                 $__WORD__=$txtArr["toUnicode"]?$this->TO_UNICODE($__WORD__):$__WORD__;
@@ -140,14 +148,18 @@ class Web
              "count"=>count($keyword_lists)
          );
     }
-    public function CREATE_HTML($mk_dir, $file_name)
+    public function CREATE_HTML($mk_dir, $file_name, $MARK=false)
     {
-        $path=$this->web_dir ."/". $mk_dir."/".$file_name;
-        if (!file_exists($this->web_dir ."/". $mk_dir)) {
-            mkdir($this->web_dir ."/". $mk_dir);
+        if ($MARK) {
+            $path=$mk_dir;
+        } else {
+            $path=$this->web_dir ."/". $mk_dir."/".$file_name;
+            if (!file_exists($this->web_dir ."/". $mk_dir)) {
+                mkdir($this->web_dir ."/". $mk_dir);
+            }
         }
         file_put_contents($path, $this->moban_temp);
-        echo "<br> ".$path." 创建成功 \n";
+        echo "<br> ".$path." HTML Create Success \n";
     }
     /**
      * 复制文件夹
@@ -167,7 +179,32 @@ class Web
             $_source = $source . '/' . $item;
             $_dest = $dest . '/' . $item;
             if (is_file($_source)) {
-                copy($_source, $_dest);
+                //copy($_source, $_dest);
+
+                $__TEMP__ONE__FULL__URL=$_source;
+                $__TEMP__ONE__NAME=$_dest;
+
+                $type=pathinfo($__TEMP__ONE__FULL__URL, PATHINFO_EXTENSION);
+                if ($type!="html"&&$type!="htm") {
+                    copy($_source, $_dest);
+                    continue;
+                }
+                // echo "<br> ".$__TEMP__ONE__FULL__URL." >>> From >>>>>> COPY_DIR HTML \n";
+                // echo "<br> ".$__TEMP__ONE__NAME." >>> To >>>>>> COPY_DIR HTML \n";
+                $this->moban_temp = file_get_contents($__TEMP__ONE__FULL__URL);
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_domain"));//域名
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_title"));//主关键词
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_company"));//企业名称
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_tell"));//qq和计划网址
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_random_keyword"));
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_random_keyword2"));
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_random_keyword3"));
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_random_keyword4"));
+                $this->MOBAN_TEMP_REPLACE($this->GET_TXT_LIST("ajian_random_keyword5"));
+                $this->MOBAN_TEMP_RANDOM_STRING();// {{ajian_random_6_abc}}随机字符串(每一个页相同，不同页面随机)
+                $this->MOBAN_TEMP_ALLRANDOM_STRING();// {{ajian_true_random_6_abc}}随机字符串（同一页里，每个随机）
+                $this->MOBAN_TEMP_ALLRANDOM_DATETIME();// {{ajian_true_random_7_datetime}}最近7天内随机时间
+                $this->CREATE_HTML($__TEMP__ONE__NAME, $__TEMP__ONE__NAME, true);
             }
             if (is_dir($_source)) {
                 $this->COPY_DIR($_source, $_dest);

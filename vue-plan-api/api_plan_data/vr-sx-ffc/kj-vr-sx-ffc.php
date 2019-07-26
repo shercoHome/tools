@@ -702,7 +702,7 @@ class vrsxffc
         if (!file_exists($mk_dir)) {
             mkdir($mk_dir);
         }
-        $mk_dir.="/".substr(explode('.', basename(__FILE__))[0],4,-3);
+        $mk_dir.="/".explode('.', basename(__FILE__))[0];
         if (!file_exists($mk_dir)) {
             mkdir($mk_dir);
         }

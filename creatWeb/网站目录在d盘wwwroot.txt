@@ -1,2 +1,0 @@
-网站目录在  D:/wwwroot
-涉及到  IISaddDomain.bat 、copy.bat和  run.php

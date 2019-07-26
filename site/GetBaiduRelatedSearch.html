@@ -1,0 +1,153 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>get-history</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="js/common.js"></script>
+</head>
+
+<body>
+    请输入 关键词（一行一个）:<br>
+    <div class="box">
+        <textarea id="myKeyWordList"></textarea>
+    </div>
+    <br>
+    屏蔽相似度 <input id="percent" type="text" style="width:2em" value="100">% 以下的词
+    <input type="checkbox" id="checkBaiduKeyWord" name="box"><label class="red"
+        for="checkBaiduKeyWord">同时检测屏蔽词（较慢）</label>
+    最多搜索<input id="limit" type="text" style="width:2em" value="100">个关键词
+    <button id="start">开始查询</button>
+    状态：<span id="info">待查询</span><span id="countdone">0</span>/<span id="allurl">2</span>
+    <button id="clear">清除结果</button>
+    <button id="select">查询完成后，点此隐藏/显示屏蔽的词</button>
+
+    <hr>
+    <table>
+        <thead>
+            <th>#</th>
+            <th>关键词</th>
+            <th>是否可用</th>
+        </thead>
+        <tbody id="re">
+
+        </tbody>
+    </table>
+    <script>
+        var max;
+        var t;
+        var info = document.getElementById("info");
+
+        $(document).ready(function () {
+
+            document.getElementById("limit").value = localStorage.limit || 60;
+            document.getElementById("percent").value = localStorage.percent || 99;
+            document.getElementById("myKeyWordList").value = localStorage.myKeyWordList || "网络时时彩骗局揭秘\r\n买13458和02679技巧";
+
+            $("#start").click(function () {
+                t = Date.parse(new Date());
+                var textarea = document.getElementById("myKeyWordList").value;
+                localStorage.myKeyWordList = textarea;
+                var dArr = textarea.split(/[(\r\n)\r\n]+/);
+
+
+                document.getElementById("allurl").innerText = dArr.length;
+
+                GetBaiduRelatedSearch(dArr, 0,dArr.length)
+            });
+            $("#clear").click(function () {
+                document.getElementById("re").innerHTML = "";
+                info.innerHTML = "清除完成";
+            });
+            $("#select").click(function () {
+                $(".select_false").fadeToggle();
+            });
+        });
+        function GetBaiduRelatedSearch(dArr, index,baseLength) {
+
+            var limit = document.getElementById("limit").value;
+            localStorage.limit = limit;
+            var percent = document.getElementById("percent").value;
+            localStorage.percent = percent;
+            percent = percent / 100;
+            var checkBaiduKeyWord = document.getElementById("checkBaiduKeyWord").checked;
+
+            var __word__ = dArr[index];
+
+            info.innerHTML = "查询中";
+            var url = "php/api.php";
+            var _postData_ = {
+                type: "GetBaiduRelatedSearch",
+                searchWord: __word__,//encodeURIComponent(),
+                // searchPercent: percent,
+                // needCheck: checkBaiduKeyWord
+            }
+            $.post(url, _postData_, function (r) {
+                info.innerHTML = "<b>查询完成</b>";
+                r = JSON.parse(r);
+
+                re = r.data;
+                let next = index + 1;
+                let justForTableIndex =dArr.length-baseLength+1;
+                re.forEach(element => {
+                    let keyword = element.keyword;
+
+                    if (dArr.indexOf(keyword) == -1) {
+
+                        $("#re").prepend("<tr id='d" + justForTableIndex + "' >"
+                            + "<td>" + justForTableIndex + "</td>"
+                            + "<td>" + keyword + "</td>"
+                            + "<td id='re" + justForTableIndex + "' >未检测</td>"
+                            + "</tr>");
+                        dArr.push(keyword);
+                        ////////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////////
+                        let __word__ = keyword;
+
+                        var _postData_ = {
+                            type: "checkBaiduKeyWord",
+                            searchWord: __word__,//encodeURIComponent(__word__),
+                            searchPercent: percent
+                        };
+                        if (checkBaiduKeyWord) {
+                            (function (d, i) {
+                                var url = "php/api.php";
+                                $.post(url, d, function (r) {
+                                    r = JSON.parse(r);
+                                    console.log(r);
+                                    $("#re" + i).html(r.re ? "正常" : "禁词");
+                                    $("#d" + i).addClass(r.re ? "select_true" : "select_false");
+                                });
+                            })(_postData_, justForTableIndex);
+                        }
+
+                        ////////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////////
+                        ////////////////////////////////////////////////////////////
+                        justForTableIndex++;
+                    }
+
+                });
+
+                document.getElementById("allurl").innerText = dArr.length;
+
+                if (next < dArr.length && dArr.length < limit) {
+                    GetBaiduRelatedSearch(dArr, next,baseLength)
+                } else {
+                    t = (Date.parse(new Date()) - t) / 1000;
+                    $("#re").append("<tr><td>总耗时</td><td colspan='7'>" + t + "</td></tr>");
+                    $("#re").append("<tr><td>平均耗时</td><td colspan='7'>" + t / dArr.length + "</td></tr>");
+                }
+                document.getElementById("countdone").innerText = next;
+            });
+        }
+    </script>
+</body>
+
+</html>

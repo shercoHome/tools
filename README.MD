@@ -20,7 +20,19 @@ https://keymanager.org/
 ### IIS安装证书
 http://baijiahao.baidu.com/s?id=1601252392478469692
 
-## 无法启动网站
+## 服务器相关
+### 无法从本地复制文件到远程桌面
+解决办法：
+* 重启rdpclip.exe。
+
+    rdpclip.exe is the main executable for File Copy. It provides function for the Terminal Services server that allows you to copy and paste between server and client. This program is important for the stable and secure running of your computer and should not be terminated.
+
+    1. 打开任务管理器
+    2. 结束rdpclip.exe
+    3. win+R
+    4. 输入rdpclip.exe，回车，即重新启动。
+
+## IIS建站
 ### 除非 Windows Activation Service (WAS)和万维网发布服务(W3SVC)均处于运行状态，否则无法启动网站
 
 解决办法：
@@ -61,6 +73,7 @@ http://baijiahao.baidu.com/s?id=1601252392478469692
 .apk|application/vnd.android.package-archive|
 .woff|application/x-font-woff|
 
+## sql相关
 ### 评论表的设计
 
 字段名称|字段说明

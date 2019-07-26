@@ -6,6 +6,7 @@ $json_result=array("code"=>"-2","msg"=>"null","data"=>array());
 $aff='';
 $userID='';
 $token='';
+$childID='';
 $webID='';
 $shareCode='';
 $username='';
@@ -48,6 +49,11 @@ if (is_array($_POST)&&count($_POST)>0) {
     if (isset($_POST["uid"])) {
         if (strlen($_POST["uid"])>0) {
             $userID=$_POST["uid"];
+        }
+    }
+    if (isset($_POST["childID"])) {
+        if (strlen($_POST["childID"])>0) {
+            $childID=$_POST["childID"];
         }
     }
     if (isset($_POST["token"])) {
@@ -119,8 +125,16 @@ if (is_array($_POST)&&count($_POST)>0) {
     if (isset($_POST["type"])) {
         if (strlen($_POST["type"])>0) {
             switch ($_POST["type"]) {
+
                 case 'changePassword':
                 echo json_encode(changePassword($userID, $token, $password, $newpassword));
+                break;
+                
+                case 'readLetter':
+                echo json_encode(readLetter($userID, $token,$childID));
+                break;
+                case 'getLetter':
+                echo json_encode(getLetter($userID, $token));
                 break;
                 case 'updateUser':
                     echo json_encode(updateUser($userID, $token, $formKey, $formValue));
@@ -166,7 +180,6 @@ if (is_array($_POST)&&count($_POST)>0) {
 function webInt($aff, $userID, $token, $shareCode)
 {
     $re_err=array("code"=>"0","msg"=>"result err","data"=>array());
-
     $re_arr=array();
     $re_arr['webSet']=getWebSet($aff);
     $webID=($re_arr['webSet']['code']==="1")?$re_arr['webSet']['data']['id']:"";
@@ -175,8 +188,40 @@ function webInt($aff, $userID, $token, $shareCode)
     $re_arr['shareCode']=($shareCode!=="")?addShare($shareCode):$re_err;
     return $re_arr;
 }
+function readLetter($userID, $token,$childID){
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>updateUser","data"=>$isLogin);
+    }
+    require_once 'class.letter.php';
+    $DBletter=new letter();
+    $letterInfos=$DBletter->update(array("id"=>$childID,"isRead"=>"1"));
+    if ($letterInfos===true) {
+        return array("code"=>"1","msg"=>"获取站内信(".$childID.")isRead","data"=>$letterInfos);
+    } else {
+        return array("code"=>"0","msg"=>"获取站内信失败","data"=>$letterInfos);
+    }
 
+}
+function getLetter($userID, $token){
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>updateUser","data"=>$isLogin);
+    }
 
+    require_once 'class.letter.php';
+    $DBletter=new letter();
+    $letterInfos=$DBletter->show(array("userID"=>$userID));
+    if ($letterInfos!==false) {
+        return array("code"=>"1","msg"=>"获取站内信成功","data"=>$letterInfos);
+    } else {
+        return array("code"=>"0","msg"=>"获取站内信失败","data"=>$letterInfos);
+    }
+}
 function changePassword($userID, $token, $password, $newpassword)
 {
     require_once 'class.logLogin.php';
@@ -529,6 +574,12 @@ function reLogin($userID, $token)
             // echo shareCode 不正确？ 程序出错了
         }
 
+                        //获取站内信
+                        require_once 'class.letter.php';
+                        $DBletter=new letter();
+                        $letterInfos=$DBletter->show(array("userID"=>$userID));
+                        $userInfo['letter']=$letterInfos;
+                        
         $json_result=array("code"=>"1","msg"=>"toCheckLogin success","data"=> $userInfo);
     } else {
         $json_result=array("code"=>"2","msg"=>"登录超时<br>toCheckLogin","data"=>$toCheckLogin);
@@ -736,7 +787,12 @@ function userLogin($name, $psw, $aff, $fromLink)
                     //
                 };
                 $userInfo['loginToken']=$loginToken;
-                
+
+                //获取站内信
+                require_once 'class.letter.php';
+                $DBletter=new letter();
+                $letterInfos=$DBletter->show(array("userID"=>$userID));
+                $userInfo['letter']=$letterInfos;
 
                 //0-id 1-user 2-psw 3-time 4-ip 5-code 6-userAuthorize
                 $json_result=array("code"=>"1","msg"=>"登录成功","data"=>$userInfo);

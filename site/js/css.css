@@ -1,0 +1,96 @@
+a{
+    color:#999;
+}
+.activelink{
+    color:red;
+}
+body {
+    text-align: center;
+}
+
+textarea {
+    height: 100px;
+    width: 100%;
+}
+
+table {
+    /* width: 100%; */
+    margin: 0 auto;
+    font-family: verdana, arial, sans-serif;
+    font-size: 11px;
+    color: #333333;
+    border-width: 1px;
+    border-color: #666666;
+    border-collapse: collapse;
+}
+
+table th {
+    text-align: center;
+    color: #FFF;
+    border-width: 1px;
+    padding: 5px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #37393a;
+    vertical-align: middle;
+    /*background-color: #dedede;*/
+}
+
+table td {
+    text-align: center;
+    border-width: 1px;
+    padding: 2px 5px;
+    border-style: solid;
+    border-color: #666666;
+    text-align: center;
+    /*background-color: #ffffff;*/
+}
+
+#limitYear,#myDomainLimit {
+    width: 40px;
+    text-align: center;
+}
+
+#info b {
+    font-size: 24px;
+    color: red;
+}
+
+#countdone {
+    margin-left: 2em;
+}
+
+
+.box>div {
+    width: 45%;
+    float: left;
+    margin-top: 1em;
+    box-sizing: border-box;
+}
+
+.box .l {
+    margin-left: 5%;
+}
+
+.box .r {
+    text-align: left;
+    padding-left: 2em;
+}
+
+
+button {
+    margin: .5em 2em;
+
+}
+
+.select_true {
+    color: blue;
+}
+
+.select_false {
+    color: red;
+}
+
+.red {
+    color: red;
+}

@@ -118,13 +118,30 @@ if (is_array($_POST)&&count($_POST)>0) {
                     $path=$mk_dir."/bulletin.txt";
 
                     $bulletinSize = file_put_contents($path, $_POST['bulletin']);
-                    if($bulletinSize){
+                    if ($bulletinSize) {
                         $json_result= array("code"=>"1","msg"=>"更新公告成功","data"=>$bulletinSize);
-                    }else{
+                    } else {
                         $json_result= array("code"=>"0","msg"=>"try更新公告失败","data"=>$bulletinSize);
                     }
                     
-                    break;
+                break;
+                
+                case "addLetter":
+
+                $json_result= addLetter($userID, $token, $childID, $formKey, $formValue);
+                break;
+                case "deleteMyLetters":
+                $json_result= deleteMyLetters($userID, $token, $childID);
+                break;
+                // case "updateMyLetters":
+                // $json_result= updateMyLetters($userID, $token, $childID);
+                // break;
+                case "getMyLetters":
+                $json_result= getMyLetters($userID, $token, $formKey, $formValue);
+                break;
+                case "websiteOverview":
+                $json_result= websiteOverview($userID, $token, $childID);
+                break;
                 case "changeAgent":
                 $json_result=changeAgent($userID, $token, $childID, $userName);
                 break;
@@ -321,8 +338,195 @@ function createCDagent($userName, $psw, $creator, $siteLink='', $siteConfig='')
 
     return $cdID;
 }
+function addLetter($userID, $token, $childID, $formKey, $formValue)
+{
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>deleteMyLetters","data"=>$isLogin);
+    }
+    require_once 'class.user.php';
+    $user=new user();
+    $userType=$user->isAdmin(array("id"=>$userID));
+
+    $isAgent=($userType===true||$userType==='1'||$userType==='2');
+    $isAdmin=($userType===true);
 
 
+    if ($isAgent!==true) {
+        return array("code"=>"0","msg"=>"非管理员无法发送站内信息<br>addLetter","data"=>$isAgent);
+    }
+
+    //会员账号列表，检测是否存在，是否是其线下
+    $childNameList=explode(",", $childID);
+    if ($childID=="all") {
+        $childNameList=$user->showUserListByAgentID(array('agentID'=>$userID));
+        $childNameListLength=count($childNameList);
+        if ($childNameListLength<=0) {
+            return array("code"=>"0","msg"=>"未找到线下会员<br>addLetter","data"=>$childNameList);
+        }
+        $TEMP_RIGHT_ID=array();
+        $TEMP_RIGHT_NAME=array();
+        for ($x=0;$x<$childNameListLength;$x++) {
+            $childOne = $childNameList[$x];
+            array_push($TEMP_RIGHT_ID, $childOne["id"]);
+            array_push($TEMP_RIGHT_NAME, $childOne["userName"]);
+        }
+
+    } else {
+        $childNameListLength=count($childNameList);
+        $TEMP_RIGHT_ID=array();
+        $TEMP_RIGHT_NAME=array();
+        for ($x=0;$x<$childNameListLength;$x++) {
+            $childName = $childNameList[$x];
+            $childInfos=$user->show(array("userName"=>$childName));
+            if ($childNameList!=false) {
+                if (count($childInfos)==1) {
+                    $__childID__=$childInfos[0]['id'];
+                    $isChild=$user->isAfromB($__childID__, $userID);
+                    if ($isChild) {
+                        array_push($TEMP_RIGHT_ID, $__childID__);
+                        array_push($TEMP_RIGHT_NAME, $childName);
+                    }
+                }
+            }
+        }
+        if (count($TEMP_RIGHT_ID)<=0) {
+            return array("code"=>"0","msg"=>"您输入的账号不正确","data"=>$TEMP_RIGHT_ID);
+        };
+    }
+
+
+
+    require_once 'class.letter.php';
+    $myLetter=new letter();
+    $letterConfig=array();
+    $letterConfig['userIDList']=$TEMP_RIGHT_ID;
+    $letterConfig['title']=$formKey;
+    $letterConfig['content']=$formValue;
+    $letterConfig['creater']=$userID;
+    $myLetterDelete=$myLetter->insert($letterConfig);
+ 
+    if ($myLetterDelete!=false) {
+        return array("code"=>"1","msg"=>"站内信息发送成功","data"=>implode(",", $TEMP_RIGHT_NAME));
+    } else {
+        return array("code"=>"0","msg"=>"站内信息发送失败","data"=>$myLetterDelete);
+    }
+}
+function deleteMyLetters($userID, $token, $childID)
+{
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>deleteMyLetters","data"=>$isLogin);
+    }
+    require_once 'class.user.php';
+    $user=new user();
+    $userType=$user->isAdmin(array("id"=>$userID));
+
+ 
+    $isAgent=($userType===true||$userType==='1'||$userType==='2');
+    $isAdmin=($userType===true);
+
+    require_once 'class.letter.php';
+    $myLetter=new letter();
+    //将 消息的ID 赋值给 letterID
+    $letterID=$childID;
+    $letterLists=$myLetter->show(array("id"=>$letterID));
+    if ($letterLists==false) {
+        return array("code"=>"0","msg"=>"您要删除的消息不存在<br>deleteMyLetters","data"=>$letterLists);
+    }
+    //将 消息的所属的会员 赋值给 childID
+    $childID=$letterLists[0]['userID'];
+    $isChild=$user->isAfromB($childID, $userID);
+
+    if (!$isChild) {
+        return array("code"=>"0","msg"=>$childID."->您要删除的消息不存在，owner err","data"=>$childID);
+    }
+
+    if ($isAgent!==true && $isSelf!==true) {
+        return array("code"=>"0","msg"=>"非管理员或本人无法删除站内信息<br>deleteMyLetters","data"=>$isAgent."+".$isSelf);
+    }
+
+
+    $letterConfig=array();
+    $letterConfig['id']=$letterID;
+    $letterConfig['isDelete']='1';
+    $myLetterDelete=$myLetter->update($letterConfig);
+
+    if ($myLetterDelete!=false) {
+        return array("code"=>"1","msg"=>"删除站内信息成功","data"=>$myLetterDelete);
+    } else {
+        return array("code"=>"0","msg"=>"删除站内信息失败","data"=>$myLetterDelete);
+    }
+}
+function getMyLetters($userID, $token, $formKey, $formValue)
+{
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>getMyLetters","data"=>$isLogin);
+    }
+
+    require_once 'class.user.php';
+    $user=new user();
+
+    //////// 检查输入的用户名  开始
+    $userName=$formValue;
+    $re_userName_is=$user->show(array("userName"=>$userName));
+    if ($re_userName_is==false) { //不存在
+        return array("code"=>"0","msg"=>"获取失败，账号不存在<br>getMyLetters","data"=>$re_userName_is);
+    }
+    $childID=$re_userName_is[0]['id'];
+    //////// 检查输入的用户名  结束
+    $userType=$user->isAdmin(array("id"=>$userID));
+    $isSelf=($userID==$childID);
+    $isChild=$user->isAfromB($childID, $userID);
+    $isAgent=($userType===true||$userType==='1'||$userType==='2');
+    $isAdmin=($userType===true);
+
+    if ($formKey=="userName"&&!$isChild) {
+        return array("code"=>"0","msg"=>$formValue."不是您的线下会员","data"=>$childID);
+    }
+    if ($formKey=="agentName" && !$isChild && !$isSelf) {
+        return array("code"=>"0","msg"=>$formValue."不是您的线下代理","data"=>$childID);
+    }
+    if ($isAgent!==true && $isSelf!==true) {
+        return array("code"=>"0","msg"=>"非管理员或本人无法操作<br>getMyLetters","data"=>$isAgent."+".$isSelf);
+    }
+
+    require_once 'class.letter.php';
+    $letter=new letter();
+
+    $letterConfig=array();
+
+    $letterConfig[$formKey]=$userName;
+    if ($isAdmin&&$isSelf) {
+        $letterConfig=array();
+    }
+
+
+    if (isset($GLOBALS["page"])) {
+        $letterConfig["page"]=$GLOBALS['page'];
+    }
+    if (isset($GLOBALS["n"])) {
+        $letterConfig["n"]=$GLOBALS['n'];
+    }
+    if (isset($GLOBALS["sort"])) {
+        $letterConfig["sort"]=$GLOBALS['sort'];
+    }
+
+
+    $letterLists=$letter->show($letterConfig);
+    if ($letterLists!==false) {
+        return array("code"=>"1","msg"=>"获取站内消息成功","data"=>$letterLists);
+    } else {
+        return array("code"=>"0","msg"=>"获取站内消息失败","data"=>$letterLists);
+    }
+}
 
 function deleteMyLotteryApi($userID, $token, $childID)
 {
@@ -610,14 +814,14 @@ function changeAgent($userID, $token, $childID, $userName)
     } else {
         $actorUserID=$re_actorUserName[0]['id'];
         if ($re_actorUserName[0]['userLevel']!=='3') {
-            return array("code"=>"0","msg"=>"只能转移角色为 会员 的账号","data"=>$re_acceptAgentName);
+            return array("code"=>"0","msg"=>"只能转移角色为 会员 的账号","data"=>$re_actorUserName);
         }
     }
     //////// 检查输入的 childID  结束
 
     $isChild=$user->isAfromB($actorUserID, $userID);
     if (!$isChild) {
-        return array("code"=>"0","msg"=>$childID."不是您的线下会员","data"=>$re_acceptAgentName);
+        return array("code"=>"0","msg"=>$childID."不是您的线下会员","data"=>$isChild);
     }
 
     //////// 检查输入的 userName  开始
@@ -1489,9 +1693,7 @@ function doChange($userID, $token, $childID, $form, $formKey, $formValue)
 
     if ($isAdmin===true) {
         if ($form==='user') {
-
-
-            if($formKey=='userName'){
+            if ($formKey=='userName') {
                 $showUserList=$user->show(array("userName"=>$formValue));
                 if ($showUserList!=false) {//判断用户是否存在
                     return array("code"=>"0","msg"=>"修改失败,账号已存在<br>admin doChange user","data"=>$formValue);
@@ -1563,8 +1765,7 @@ function doChange($userID, $token, $childID, $form, $formKey, $formValue)
                 $re_update=$DBwebsetting->update(array("userID"=>$childID,$formKey=>$formValue));
                 loopChange($childID, $formKey, $formValue);
             } else {
-
-                if($formKey=='userName'){
+                if ($formKey=='userName') {
                     $showUserList=$user->show(array("userName"=>$formValue));
                     if ($showUserList!=false) {//判断用户是否存在
                         return array("code"=>"0","msg"=>"修改失败,账号已存在<br>admin doChange user","data"=>$formValue);
@@ -1916,7 +2117,9 @@ function getMySiteSetting($userID, $token, $childID)
                 $re_webArrOne[$key]=$value;
             }
             //此站长可修改的信息
-            if($key=="userLevel"||$key=="agentName"){continue;}
+            if ($key=="userLevel"||$key=="agentName") {
+                continue;
+            }
             if ($key!=="id"&&$key!=="userID"&&$key!=="userName"&&$json_limit[$adminLimitKey]!=0) {
                 $re_webArrOne[$key]=$value;
                 $re_limit[$key]=$json_limit[$adminLimitKey];
@@ -1933,6 +2136,53 @@ function getMySiteSetting($userID, $token, $childID)
         $json_result=array("code"=>"1","msg"=>"获取成功<br>getMySiteSetting","data"=>$re_arr);
     } else {
         $json_result=array("code"=>"0","msg"=>"获取出错<br>getMySiteSetting","data"=>$json_set);
+    }
+    return $json_result;
+}
+
+function websiteOverview($userID, $token, $childID)
+{
+    require_once 'class.logLogin.php';
+    $logLogin=new logLogin();
+    require_once 'class.user.php';
+    $user=new user();
+
+    $isLogin=$logLogin->checkToken($userID, $token);
+    if ($isLogin!==true) {
+        return array("code"=>"-9","msg"=>"登录超时<br>websiteOverview","data"=>$isLogin);
+    }
+    $userType=$user->isAdmin(array("id"=>$userID));
+    $isSelf=($userID==$childID);
+  
+    $isAdmin=($userType===true);
+
+    if ($isSelf!==true &&  $isAdmin!==true) {
+        return array("code"=>"-2","msg"=>"权限不足<br>websiteOverview","data"=>array());
+    }
+
+    $agentInfo=array();
+    if ($childID!="") {
+        if (is_numeric($childID)) {
+            $agentInfo["agentID"]=$childID;
+        } else {
+            $agentInfo["agentName"]=$childID;
+        }
+    }
+
+    if ($isAdmin === true) {
+        $agentInfo["isAdmin"]="1";
+    }
+
+    if (count($agentInfo)==0 && $isSelf) {
+        return array("code"=>"-2","msg"=>"未查询到信息<br>websiteOverview err enter =".$childID,"data"=>array());
+    }
+    $re_arr=$user->websiteOverview($agentInfo);
+
+
+    if ($re_arr!==false) {
+        $json_result=array("code"=>"1","msg"=>"获取会员概况成功","data"=>$re_arr[0]);
+    } else {
+        $json_result=array("code"=>"0","msg"=>"获取出错<br>websiteOverview","data"=>$re_arr);
     }
     return $json_result;
 }

@@ -1,4 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -6,66 +7,17 @@
     <title>域名分组</title>
     <meta name="description" content="" />
     <meta name="keywords" content="" />
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-        crossorigin="anonymous"></script>
-    <style>body{
-            text-align: center;
-        }
-        textarea{
-            height:100px;
-            width: 600px;
-        }
-        	table {
-		/* width: 100%; */
-        margin: 0 auto;
-		font-family: verdana, arial, sans-serif;
-		font-size: 11px;
-		color: #333333;
-		border-width: 1px;
-		border-color: #666666;
-		border-collapse: collapse;
-	}
-	
-	table th {
-		text-align: center;
-		color: #FFF;
-		border-width: 1px;
-		padding: 5px;
-		border-style: solid;
-		border-color: #666666;
-		background-color: #37393a;
-		vertical-align: middle;
-		/*background-color: #dedede;*/
-	}
-	
-	table td {
-		text-align: center;
-		border-width: 1px;
-		padding: 2px 5px;
-		border-style: solid;
-		border-color: #666666;
-		text-align: center;
-		/*background-color: #ffffff;*/
-	}
-    #limitYear{
-        width: 40px;
-        text-align: center;
-    }
-    #info b{
-        font-size:24px;
-        color: red;
-    }
-        </style>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="js/common.js"></script>
 </head>
 
-<body>
-    <p><a href="openWeb.html">批量访问</a>|<a href="siteBaidu.html">批量siteBaidu</a>|<a href="dfz.html">域名分组</a>|<a href="get-history.html">域名历史</a></p>
-    域名分组：请输入域名（一行一个）:<br>
+<body> 域名分组：请输入域名（一行一个）:<br>
     <textarea id="domains">jbua.cn
 iyil.cn</textarea>
     <br>
 
-    以<input type="text" id="limitYear" value="2">个域名为一组
+    以<input type="text" id="myDomainLimit" value="2">个域名为一组
     <button id="start">开始分组</button>
     <button id="clear">清除结果</button>
     <br>
@@ -85,32 +37,33 @@ iyil.cn</textarea>
         var t;
         var info = document.getElementById("info");
         $(document).ready(function () {
-
+            document.getElementById("domains").value= localStorage.domains || "rgjh999.cn\r\nrgjh777.cn";
+             document.getElementById("myDomainLimit").value = localStorage.myDomainLimit || 3;
             $("#start").click(function () {
 
                 t = Date.parse(new Date());
                 var textarea = document.getElementById("domains").value;
-                // var dArr = textarea.split(/[(\r\n)\r\n]+/);
                 var dArr = textarea.split(/[\r\n]+/);
 
-                var limitYear = Number(document.getElementById("limitYear").value);
+                var myDomainLimit = Number(document.getElementById("myDomainLimit").value);
 
                 var l = dArr.length;
 
+                localStorage.domains=textarea;
+                localStorage.myDomainLimit=myDomainLimit;
+                for (var i = 0; i < l; i = i + myDomainLimit) {
 
-                for (var i = 0; i < l; i = i + limitYear) {
 
+                    console.log(i);
+                    var xxx = dArr[i];
+                    for (var ii = 1; ii < myDomainLimit; ii++) {
 
-console.log(i);
-                    var xxx=dArr[i];
-                    for (var ii = 1; ii < limitYear; ii++) {
-
-                        xxx+="," +dArr[i+ii];
+                        xxx += "," + dArr[i + ii];
 
                     }
 
 
-                    $("#re").append("<tr><td>" + Number(i / limitYear + 1) + "</td><td>" + xxx + "</td></tr>");
+                    $("#re").append("<tr><td>" + Number(i / myDomainLimit + 1) + "</td><td>" + xxx + "</td></tr>");
 
                 }
 

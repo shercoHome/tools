@@ -1,0 +1,283 @@
+/*重置*/
+@charset "utf-8";
+*{ margin:0px; padding:0px;}
+a{ color: #323232; text-decoration:none}
+a:hover{color: #c32a2a;}
+table{border-collapse:collapse; border-spacing:0px;}
+body{word-wrap:break-word;color: #323232;font: 12px/24px "微软雅黑","Microsoft YaHei","\5FAE\8F6F\96C5\9ED1";}
+ul,dl,li,i{list-style:none;}
+h1,h2,h3,h4,h5{font-size:12px;font-weight:normal;}
+i,em,b{font-style:normal;font-weight:normal;list-style:none;}
+img{border: none;max-width: 100%;max-height: 100%;vertical-align: middle;}
+.opacity{filter: Alpha(opacity=0);-webkit-opacity: 0;-moz-opacity: 0;-ms-opacity: 0;-o-opacity: 0;}
+.quickbar_nav img{max-width: none; max-height: none;}
+
+#wrapper{width: 100%;height: auto;overflow: hidden;position: relative;background: #ffffff;}
+
+/*页眉*/
+.header{width: 100%;height: auto;position: relative;z-index: 90;-webkit-box-shadow: 0px 1px 5px #999999;-moz-box-shadow: 0px 1px 5px #999999;-ms-box-shadow: 0px 1px 5px #999999;-o-box-shadow: 0px 1px 5px #999999;box-shadow: 0px 1px 5px #999999;behavior:url("http://{{ajian_domain}}/css/PIE.htc")/*tpa=http://www.honghuistone.cn/css/PIE.htc*/;}
+.header .head{width: 100%;height: 150px;margin: 0 auto;position: relative;}
+.head .head-top{width: 100%;height: 100px;border-bottom: solid 4px #453126;}
+.head-top .headmain{width: 1000px;height: 100%;margin: 0 auto;overflow: hidden;position: relative;}
+.headmain .logo{width: 500px;height: 100%;overflow: hidden;float: left;}
+.headmain .hotline{width: 500px;height: 38px;float: right;margin: 19px 0 3px;font-size: 14px;line-height: 38px;}
+.hotline span{display: inline-block;float: right;width: auto;padding-left: 50px;max-width: 450px;overflow: hidden;height: 100%;background: url("../images/phone.png")/*tpa=http://www.honghuistone.cn/images/phone.png*/ no-repeat left;}
+.hotline span b{font-size: 18px;color: #c22a29;}
+#search{width: 240px;height: 26px;float: right;border:solid 1px #d6d7dc;}
+#search input{width: 196px;padding: 0 8px;float: left;border:none;height: 26px;background: none;outline: none;color: #909090;font: 12px/26px "微软雅黑","Microsoft YaHei","\5FAE\8F6F\96C5\9ED1";}
+#search button{width: 27px;height: 26px;float: right;background: url("../images/map.png")/*tpa=http://www.honghuistone.cn/images/map.png*/ no-repeat center;border:none;outline: none;cursor: pointer;border-left: solid 1px #d6d7dc;}
+.head ul.nav{width: 1000px;height: 46px;position: relative;text-align: center;margin: 0 auto;}
+ul.nav>li{display: table-cell;width: 300px;height: 30px;padding: 8px 0;position: relative;}
+ul.nav>li:before{content: "";display: block;width: 1px;height: 30px;background: #d5d5d5;position: absolute;left: 0px;top: 8px;}
+ul.nav>li:first-child:before{display: none;}
+ul.nav>li>a{display: block;width: 100%;height: 30px;overflow: hidden;color: #453126;font-size: 14px;line-height: 30px;}
+ul.nav .trilateral{width: auto;height: 8px;overflow: hidden;position: absolute;left: 0px;top: 0px;}
+.trilateral i{display: block;width: 0px;height: 0px;border-top: solid 8px #453126;border-left: solid 8px transparent;border-right: solid 8px transparent;margin: 0 auto;}
+.subnav{display: none;width: auto;height: auto;overflow: hidden;position: absolute;z-index: 95;top: 38px;padding-top: 8px;max-width: 300px;}
+.subnav .triangle{width: 0px;height: 0px;border-bottom: solid 8px #453126;border-left: solid 8px transparent;border-right: solid 8px transparent;position: relative;left: 50%;margin-left: -4px;top: 0px;}
+.subnav ul.nav-list{width: 100%;height: auto;overflow: hidden;}
+ul.nav-list li{width: 100%;height: 30px;margin-top: 1px;}
+ul.nav-list li:first-child{margin-top: 0px;}
+ul.nav-list li a{display: block;width: 100%;height: 100%;font-size: 12px;line-height: 30px;color: #ffffff;text-align: center;overflow: hidden;position: relative;}
+ul.nav-list li a span{display: block;width: 100%;height: 100%;position: relative;z-index: 99;overflow: hidden;}
+ul.nav-list li a em{display: block;width: 100%;height: 100%;background: #453126;filter: Alpha(opacity=70);-webkit-opacity:0.7;-moz-opacity:0.7;-ms-opacity:0.7;-o-opacity:0.7;opacity:0.7;position: absolute;left: 0px;top: 0px;z-index: 96;}
+ul.nav-list li a:hover span{color: #c32a29;}
+ul.nav-list li a:hover em{filter: Alpha(opacity=80);-webkit-opacity:0.8;-moz-opacity:0.8;-ms-opacity:0.8;-o-opacity:0.8;opacity:0.8;}
+
+/*大图切换*/
+#banner{width: 1920px;height: 460px;overflow: hidden;position: relative;left: 50%;margin-left: -960px;}
+#banner ul.picture{width: 100%;height: 100%;}
+#banner ul.picture li{width: 1920px;height: 460px;overflow: hidden;text-align: center;}
+.dot{width: 100%;height: 20px;text-align: center;position: absolute;bottom: 20px;z-index: 90;}
+.dot ol{width: auto;height: 100%;overflow: hidden;display: inline-block;}
+.dot ol li{float: left;margin: 0 8px;width: 20px;height: 20px;cursor:pointer;text-indent: 99px;background: url("../images/dot-01.png")/*tpa=http://www.honghuistone.cn/images/dot-01.png*/ no-repeat center;overflow: hidden;}
+.dot ol li.on{background: url("../images/dot-02.png")/*tpa=http://www.honghuistone.cn/images/dot-02.png*/ no-repeat center !important;}
+.banner{width: 1920px;height: 320px;overflow: hidden;position: relative;left: 50%;margin-left: -960px;}
+.banner ul.picture li{width: 1920px;height: 320px;overflow: hidden;text-align: center;}
+
+/*文字列表*/
+.press{width: 100%;height: 40px;position: relative;z-index: 10;overflow: hidden;-webkit-box-shadow: 0px 1px 10px #dad6d4;-moz-box-shadow: 0px 1px 10px #dad6d4;-ms-box-shadow: 0px 1px 10px #dad6d4;-o-box-shadow: 0px 1px 10px #dad6d4;box-shadow: 0px 1px 10px #dad6d4;behavior:url("http://{{ajian_domain}}/css/PIE.htc")/*tpa=http://www.honghuistone.cn/css/PIE.htc*/;}
+.press .press-list{width: 1000px;height: 100%;margin: 0 auto;overflow: hidden;font-size: 12px;line-height: 40px;color: #453126;}
+.press-list h2{display: inline-block;float: left;height: 100%;max-width: 100px;}
+.press-list a.check{display: block;width: 50px;float: right;height: 100%;color: #453126;text-align: right;}
+.press-list a.check:hover{color: #c32a2a;}
+.press-list .summary{width: 850px;height: 40px;float: left;overflow: hidden;}
+.summary ul li,.summary ul li a{display: block;width: 100%;height: 40px;overflow: hidden;color: #453126;}
+.summary ul li a time{float: left;}
+.summary ul li a span{display: inline-block;float: left;margin-right: 20px;max-width: 750px;overflow: hidden;}
+
+/*首页-产品栏目*/
+.column-01{width: 1116px;height: 341px;padding: 55px 0;margin: 0 auto;}
+.column-hd{width: 1000px;height: 48px;margin: 0 auto;text-align: center;position: relative;}
+.column-hd .name{display: inline-block;width: auto;height: 100%;min-width: 160px;}
+.name h2{width: auto;height: 24px;padding: 0 20px;font-size: 16px;line-height: 24px;color: #cec5bf;}
+.name h3{width: auto;height: 24px;padding: 0 20px;font-size: 20px;line-height: 24px;color: #453126;}
+.sticks li{width: auto;height: 1px;margin: 3px 0;background: #cec5bf;position: absolute;top: 20px;}
+.sticks li.stick-left{padding-right: 7px;left: 0px;}
+.sticks li.stick-right{padding-left: 7px;right: 0px;}
+.sticks li i{display: block;width: 7px;height: 7px;background: #cec5bf;position: absolute;top:-3px;z-index: 10;-webkit-border-radius: 3px;-moz-border-radius: 3px;-ms-border-radius: 3px;-o-border-radius: 3px;border-radius: 3px;behavior:url("http://{{ajian_domain}}/css/PIE.htc")/*tpa=http://www.honghuistone.cn/css/PIE.htc*/;}
+.sticks li.stick-left i{right: 0px;}
+.sticks li.stick-right i{left: 0px;}
+
+.column-pro{width: 1020px;height: 270px;margin-top: 23px;position: relative;padding: 0 48px;}
+.column-pro .pro{width: 100%;height: 100%;overflow: hidden;}
+.pro ul li{width: 245px;height: 269px;overflow: hidden;float: left;margin: 0 5px;}
+.pro ul li a{display: block;width: 200px;height: 229px;position: relative;z-index: 10;padding: 19px 16px 9px 17px;text-align: center;border:solid 1px #cec5bf;margin: 5px;}
+.pro ul li a i{display: block;width: 100%;height: 180px;}
+.pro ul li a p{width: 100%;height: 24px;overflow: hidden;margin: 4px 0 1px;color: #453126;}
+.pro ul li a b{display: block;width: 88px;height: 18px;overflow: hidden;text-align: center;border:solid 1px #cec5bf;margin: 0 auto;line-height: 18px;color: #cec5bf;} 
+.pro ul li a:hover{-webkit-box-shadow: 0px 0px 5px #cec5bf;-moz-box-shadow: 0px 0px 5px #cec5bf;-ms-box-shadow: 0px 0px 5px #cec5bf;-o-box-shadow: 0px 0px 5px #cec5bf;box-shadow: 0px 0px 5px #cec5bf;behavior:url("http://{{ajian_domain}}/css/PIE.htc")/*tpa=http://www.honghuistone.cn/css/PIE.htc*/;}
+.pro ul li a:hover b{background: #c32a2a;border:solid 1px #c32a2a;color: #ffffff;}
+.column-pro .arrows a{width: 48px;height: 48px;position: absolute;top: 111px;}
+.column-pro .arrows a.prev{left: 0px;background: url("../images/circle-01.png")/*tpa=http://www.honghuistone.cn/images/circle-01.png*/ no-repeat center;}
+.column-pro .arrows a.prev:hover{background: url("../images/circle-02.png")/*tpa=http://www.honghuistone.cn/images/circle-02.png*/ no-repeat center;}
+.column-pro .arrows a.next{right: 0px;background: url("../images/circle-03.png")/*tpa=http://www.honghuistone.cn/images/circle-03.png*/ no-repeat center;}
+.column-pro .arrows a.next:hover{background: url("../images/circle-04.png")/*tpa=http://www.honghuistone.cn/images/circle-04.png*/ no-repeat center;}
+a.more{display: block;width: 88px;height: 18px;overflow: hidden;text-align: center;border:solid 1px #c32a2a;margin: 0 auto;line-height: 18px;color: #c32a2a;}
+a.more:hover{background: #c32a2a;color: #ffffff;}
+.column-01 a.more{margin-top: 15px;}
+
+/*首页-公司简介栏目*/
+.column-02{width: 100%;height: 358px;padding: 18px 0 56px;background: url("../images/wood.jpg")/*tpa=http://www.honghuistone.cn/images/wood.jpg*/;}
+.column-about{width: 1000px;height: 282px;margin:28px auto 0;position: relative;}
+.column-about .aboutimg{width: 470px;height: 100%;float: left;background: #ffffff;}
+.aboutimg i{display: table-cell;width: 470px;height: 282px;text-align:center;vertical-align: middle;}
+.column-about .mation{width: 530px;height: 282px;background: #ffffff;filter: Alpha(opacity=70);-webkit-opacity: 0.7;-moz-opacity: 0.7;-ms-opacity: 0.7;-o-opacity: 0.7;opacity: 0.7;position: absolute;z-index: 5px;right: 0px;top: 0px;}
+.column-about .infomation{width: 495px;height: 208px;padding: 51px 17px 23px 18px;position: relative;z-index: 10;float: right;}
+.infomation ol.info-hd{width: 314px;height: 28px;margin: 0 auto;border:solid 1px #453126;position: relative;}
+ol.info-hd li{width: 104px;height: 100%;float: left;border-left: solid 1px #453126;position: relative;z-index: 20;}
+ol.info-hd li:first-child{border-left: none;}
+ol.info-hd li a{display: block;width: 100%;height: 100%;text-align: center;font-size: 14px;line-height: 28px;color: #453126;}
+ol.info-hd li.on a{color: #ffffff;}
+ol.info-hd .lump{width: 104px;height: 28px;background: #453126;position: absolute;left: 0px;top: 0px;z-index: 11;}
+ol.info-hd .lump i{display: block;width: 0px;height: 0px;border-top:solid 8px #453126;border-left: solid 7px transparent;border-right: solid 7px transparent;position: absolute;top: 28px;left: 50%;margin-left: -7px;}
+.infomation .info{width: 100%;height: 154px;margin-top: 24px;}
+.info ul li{width: 495px;height: 154px;overflow: hidden;position: relative;float: left;}
+.info ul li article{width: 100%;height: 120px;overflow: hidden;}
+.info ul li a.more{margin-top: 10px;}
+
+/*首页-新闻资讯栏目*/
+.column-03{width: 1000px;height: 386px;padding-top:54px;margin: 0 auto;}
+.column-news{width: 100%;height: 276px;margin: 18px 0 20px;position: relative;}
+.column-news ol.news-center{width: 576px;height: 100%;float: left;overflow: hidden;position: relative;}
+ol.news-center li{width: 100%;height: 80px;overflow: hidden;margin-top: 18px;}
+ol.news-center li:first-child{margin-top: 0px;}
+ol.news-center li a{display: block;width: 100%;height: 100%;overflow: hidden;position: relative;}
+ol.news-center li a .time{width: 80px;height: 80px;color: #ffffff;text-align: center;position: relative;z-index: 10;background: #cec5bf;-webkit-border-radius: 40px;-moz-border-radius: 40px;-ms-border-radius: 40px;-o-border-radius: 40px;border-radius: 40px;behavior:url("http://{{ajian_domain}}/css/PIE.htc")/*tpa=http://www.honghuistone.cn/css/PIE.htc*/;float: left;}
+.time b{display: block;width: 100%;height: 40px;padding-top: 10px;font-size: 43px;line-height: 40px;overflow: hidden;}
+.time span{display: block;width: 100%;height: 16px;font-size: 13px;line-height: 16px;overflow: hidden;}
+ol.news-center li a .essay{width: 486px;height: 79px;border-bottom: solid 1px #cec5bf;float: right;}
+.essay h3{width: 100%;height: 28px;overflow: hidden;font-size: 15px;line-height: 28px;color: #453126;}
+.essay p{width: 100%;height: 48px;overflow: hidden;font-size: 12px;line-height: 24px;color: #8a7162;}
+ol.news-center li.on a .time{background: #c32a2a;}
+ol.news-center li a:hover .essay h3{color: #c32a2a;}
+.column-news .newsimg{width: 404px;height: 276px;float: right;overflow: hidden;}
+.newsimg ul li{width: 404px;height: 276px;overflow: hidden;position: relative;text-align: center;}
+.newsimg ul li i{display: table-cell;width: 404px;height: 276px;text-align: center;vertical-align: middle;}
+.column-news .newstxt{width: 404px;height: 40px;position: absolute;right: 0px;bottom: 0px;z-index: 50;}
+.newstxt .shadow{width: 100%;height: 40px;background: #000000;filter: Alpha(opacity=70);-webkit-opacity: 0.7;-moz-opacity: 0.7;-ms-opacity: 0.7;-o-opacity: 0.7;opacity: 0.7;position: absolute;left: 0px;bottom: 0px;z-index: 60;}
+.newstxt ul li{width: 404px;height: 40px;overflow: hidden;}
+.newstxt ul li a{display: block;width: 100%;height: 100%;font-size: 14px;line-height: 40px;color: #ffffff;position: relative;z-index: 70;text-align: center;}
+.newstxt ul li a:hover{text-decoration: underline;}
+.column-03 a.more{height: 22px;line-height: 22px;}
+
+/*首页-咨询*/
+.column-contact{width: 1000px;height: 200px;overflow: hidden;margin: 60px auto;background: #f7f7f7;}
+.column-contact .tatimg{width: 680px;height: 100%;float: left;overflow: hidden;}
+.column-contact .consult{width: 280px;height: 100%;float: right;}
+.consult span{display: table-cell;width: 280px;height: 200px;vertical-align: middle;overflow: hidden;}
+
+/*页脚*/
+#footer{width: 100%;height: auto;overflow: hidden;background: #ded8d1;position: relative;padding: 15px 0;}
+#footer .flink{width: 1000px;margin: 0 auto;min-height: 24px;height: auto;color: #8b570b;text-align: center;line-height: 24px;color: #453126;}
+.flink a{color: #453126;margin: 0 8px;}
+#footer a:hover{text-decoration: underline;}
+#footer .foot{width: 100%;height: auto;overflow: hidden;margin-top: 10px;}
+.foot .copyright{width: 1000px;height: auto;overflow: hidden;color: #8c7b71;margin: 0 auto;text-align: center;}
+.copyright a{color: #8c7b71;margin-right: 5px;}
+
+/*内页左侧导航*/
+.leftnav{width: 240px;height: auto;float: left;position: relative;overflow: hidden;}
+.leftnav h2{width: 200px;height: 44px;padding: 17px 20px 15px;background: #453126;}
+.leftnav h2 b{display: block;width: 100%;height: 24px;overflow: hidden;font-size: 18px;line-height: 24px;color: #ffffff;overflow: hidden;}
+.leftnav h2 span{display: block;width: 100%;height: 20px;overflow: hidden;color: #8a7162;}
+.leftnav ul.first{position: relative;width: 240px;height: auto;overflow: hidden;z-index: 50;}
+ul.first>li{width: 100%;height: auto;overflow: hidden;position: relative;border-bottom: solid 1px #cec5bf;}
+ul.first>li>a{display: block;width: 205px;padding: 0 20px 0px 15px;height: 40px;font-size: 14px;line-height: 40px;color: #8e7a6e;position: relative;}
+ul.first>li>a>span{display: block;width: 100%;height: 100%;overflow: hidden;}
+ul.first>li>a:after{content: "";display: block;width: 0px;height: 0px;border-left: solid 5px #cec5bf;border-top: solid 5px transparent;border-bottom: solid 5px transparent;position: absolute;right: 15px;top: 15px;}
+ul.first>li:hover{border-bottom: solid 1px #453126;}
+ul.first>li:hover>a{color: #453126;}
+ul.first>li:hover>a:after{border-left:solid 5px #453126;}
+.box-on{border-bottom: solid 1px #453126 !important;}
+.box-on>a{color: #453126 !important;border-bottom: solid 1px #453126;}
+.box-on>a:after{border-left:solid 5px #453126 !important;}
+
+ul.first ul{width: 100%;height: auto;position: relative;overflow: hidden; display: none;}
+ul.second>li{width: 240px;height: auto;overflow: hidden;}
+ul.second>li>a{display: block;width: 210px;height: 30px;padding: 0 10px 0 20px;font-size: 12px;line-height: 30px;color: #8e7a6e;}
+ul.second>li>a>span{display: block;width: 100%;height: 100%;overflow: hidden;}
+ul.second>li>a:hover{color: #453126;background: #cec5bf;}
+.box-in>a{color: #453126 !important;background: #cec5bf !important;}
+ul.third>li{width: 100%;height: auto;overflow: hidden;}
+ul.third>li>a{display: block;width: 176px;height: 30px;overflow: hidden;line-height: 30px;padding: 0 32px;color: #8e7a6e;}
+ul.third>li>a:hover{color: #453126;}
+
+/*内页*/
+.content{width: 1000px;height: auto;overflow: hidden;margin: 40px auto;}
+.content .inside{width: 720px;height: auto;overflow: hidden;float: right;}
+.inside .main-hd{width: 100%;height: 35px;border-bottom: solid 1px #cec5bf;margin-bottom: 35px;}
+.main-hd h2.title{max-width: 300px;width: auto;overflow: hidden;float: left;position: relative;color: #453126;height: 35px;font-size: 16px;line-height: 35px;}
+h2.title span{padding: 0 10px;}
+h2.title i{font-size: 14px;color: #8a7162;}
+.main-hd .address{width: auto;height: 100%;float: right;text-align: right;font-size: 12px;line-height: 35px;color: #8a7162;overflow: hidden;}
+.address a{color: #8a7162;}
+.address a:hover{color: #453126;}
+
+.main{width: 720px;height: auto;overflow:hidden;position: relative;min-height: 300px;}
+.main .about{width: 100%;height: 100%;overflow: hidden;}
+
+/*新闻列表*/
+.main .news{width: 100%;height: auto;overflow: hidden;margin-bottom: 30px;}
+.news li{width: 100%;height: 132px;overflow: hidden;border-bottom: solid 1px #cec5bf;}
+.news li a{display: block;width: 100%;overflow: hidden;height: 70px;position: relative;padding: 36px 0 26px;color: #8a7162;-webkit-transition: all .2s ease;-moz-transition: all .2s ease;-ms-transition: all .2s ease;-o-transition: all .2s ease;transition: all .2s ease;}
+.news li a div.news-time{float: left;width: 80px;height: 100%;text-align: center;}
+div.news-time b{display: block;width: 100%;height: 46px;overflow: hidden;font-size: 48px;line-height: 46px;}
+div.news-time span{display: block;width: 100%;height: 24px;overflow: hidden;font-size: 14px;line-height: 24px;}
+.news li a .news-list{float: right;width: 630px;height: 100%;overflow: hidden;}
+.news-list h3{width: 100%;height: 28px;overflow: hidden;font-size: 14px;line-height: 28px;border-bottom: dashed 1px #cec5bf;color: #453126;}
+.news-list p{width: 100%;height: 34px;overflow: hidden;font-size: 12px;line-height: 34px;}
+.news li a:hover{background: #cec5bf;color: #ffffff;-webkit-transition: all .4s ease;-moz-transition: all .4s ease;-ms-transition: all .4s ease;-o-transition: all .4s ease;transition: all .4s ease;}
+.news li a:hover h3{color: #ffffff;border-bottom: dashed 1px #ffffff;}
+
+/*图文资讯*/
+.goods{width: 100%;height: auto;overflow: hidden;position: relative;margin-bottom: 30px;}
+.goods li{width: 100%;height: 144px;padding: 20px 0;overflow: hidden;border-bottom: solid 1px #cec5bf;}
+.goods li:first-child{margin-top: -20px;}
+.goods li i{display: block;width: 210px;height: 100%;overflow: hidden;text-align: center;float: left;}
+.goods li .goods-list{width: 490px;height: 100%;overflow: hidden;float: right;}
+.goods-list h3{width: 100%;height: 30px;font-size: 14px;line-height: 30px;overflow: hidden;border-bottom: dashed 1px #cec5bf;color: #453126;}
+.goods-list h3 time{float: right;margin-left: 5px;}
+.goods-list p{width: 100%;height: 66px;color: #8a7162;overflow: hidden;line-height: 22px;margin: 6px 0 12px;font-size: 12px;}
+.goods li a{display: block;width: 88px;height: 18px;overflow: hidden;text-align: center;border:solid 1px #cec5bf;line-height: 18px;color: #cec5bf;}
+.goods li a:hover{background: #c32a2a;border:solid 1px #c32a2a;color: #ffffff;}
+
+/*新闻详细*/
+.news-detail{width: 100%;height: auto;overflow: hidden;padding-bottom: 25px;border-bottom: dashed 1px #cec5bf;position: relative;}
+.news-hd{width: 100%;height: auto;overflow: hidden;text-align: center;position: relative;margin: -8px 0 25px;padding-bottom: 15px;border-bottom: dashed 1px #cec5bf;}
+.news-hd h2{width: 100%;height: auto;min-height: 34px;font-size: 18px;line-height: 34px;text-align: center;overflow: hidden;color: #453126;}
+.news-hd p{height: 20px;width: 100%;line-height: 20px;color: #8e7a6e;}
+.news-hd p time{margin-right: 10px;}
+.news-text{width: 100%;height: auto;overflow: hidden;position: relative;}
+
+.near-page{width: 620px;padding-right: 100px;height: auto;overflow: hidden;padding-top: 15px;position: relative;}
+.near-page li{line-height:22px;height: 22px;width: 100%;overflow: hidden;}
+.near-page li a:hover{color:#c32a2a}
+.near-page a.return{width: 80px;height: 24px;overflow: hidden;text-align: center;background: #c32a2a;color: #ffffff;position: absolute;right: 5px;top: 20px;}
+
+/*图片列表页*/
+.main .product{width: 741px;height: auto;overflow: hidden;margin-bottom: 30px;}
+.product li{width: 236px;height: 240px;float: left;margin: 0 5px 10px 0;position: relative;}
+.product li a{display: block;width: 194px;height: 198px;padding: 15px;margin: 5px;overflow: hidden;position: relative;z-index: 10;text-align: center;color: #8e7a6e;border:solid 1px #cec5bf;}
+.product li a i{display: table-cell;width: 194px;height: 172px;text-align: center;vertical-align: middle;overflow: hidden;}
+.product li a p{width: 100%;height: 16px;overflow: hidden;font-size: 12px;line-height: 16px;margin-top: 10px;}
+.product li a:hover{color: #c32a2a;-webkit-box-shadow: 0px 0px 5px #cec5bf;-moz-box-shadow: 0px 0px 5px #cec5bf;-ms-box-shadow: 0px 0px 5px #cec5bf;-o-box-shadow: 0px 0px 5px #cec5bf;box-shadow: 0px 0px 5px #cec5bf;behavior:url("http://{{ajian_domain}}/css/PIE.htc")/*tpa=http://www.honghuistone.cn/css/PIE.htc*/;}
+
+.page{width:100%;height:20px;text-align:center;overflow: hidden;font-size: 14px;}
+.page span{display: inline-block;width: auto;height: 100%;}
+.page span a{float: left;}
+.page span>a{margin: 0 8px;}
+.page span i{float: left;font-size: 12px;line-height: 20px;margin: 0 5px;}
+.page span a{font-size: 12px;line-height: 20px;}
+.page span em{float: left;margin:0 5px;}
+.page span em a{display: block;position: relative;z-index: 30;width: 20px;height: 20px;margin:0 3px;line-height: 20px;text-align: center;-webkit-border-radius: 10px;-moz-border-radius: 10px;-ms-border-radius: 10px;-o-border-radius: 10px;border-radius: 10px;behavior:url("http://{{ajian_domain}}/css/PIE.htc")/*tpa=http://www.honghuistone.cn/css/PIE.htc*/;}
+.page span>a:hover{color:#c32a2a;}
+.page span em a:hover{background: #c32a2a;color: #ffffff;}
+.page a.on{color: #ffffff;background: #c32a2a;}
+
+/*产品详细页*/
+.case{width: 500px;height: 278px;overflow: hidden;float: left;position: relative;padding: 7px;border:solid 2px #cec5bf;}
+.case .case-bd{width: 500px;height: 278px;overflow: hidden;}
+.case-bd ul li{width: 500px;height: 278px;overflow: hidden;float: left;}
+.case-bd ul li i{display: table-cell;width: 500px;height: 278px;text-align: center;vertical-align: middle;cursor: pointer;}
+.scroll a{width: 45px;height:64px;position: absolute;top: 114px;background: #8a7162;}
+.scroll a.prev{left: -50px;background: #8a7162 url("../images/prev.png")/*tpa=http://www.honghuistone.cn/images/prev.png*/ no-repeat center;}
+.scroll a.next{right: -50px;background: #8a7162 url("../images/next.png")/*tpa=http://www.honghuistone.cn/images/next.png*/ no-repeat center;}
+
+.case-right{width: 185px;height: 278px;overflow: hidden;float: right;}
+.case-right .case-text{display: table-cell;width: 185px;height: 278px;vertical-align: middle;overflow: hidden;}
+.case-text h2{width: 100%;height: auto;overflow: hidden;font-size: 16px;line-height: 30px;color: #453126;}
+
+.pro-detail{width: 100%;height: auto;overflow: hidden;position: relative;padding: 25px 0;border-bottom: dashed 1px #cec5bf;}
+.pro-detail article{width: 100%;height: 100%;overflow: hidden;}
+
+/*搜索*/
+.search{width: 100%;height: auto;overflow: hidden;text-align: center;font-size: 18px;color: #8a7162;line-height: 30px;margin-bottom: 20px;}
+.search mark{background: none;font-size: 20px;color: #453126;}
+.search-list{width: 100%;height: auto;overflow: hidden;margin-bottom: 30px;}
+ul.search-list li{width: 100%;height: 46px;border-bottom: dashed 1px #d9d9d9;list-style:none;}
+ul.search-list li a{display: block;width: 100%;height: 100%;overflow: hidden;position: relative;font-size: 14px;line-height: 46px;color: #453126;}
+ul.search-list li a time{float: right;margin-left: 5px;}
+ul.search-list li a i{float: left;margin-right: 10px;}
+ul.search-list li a:hover{color: #c32a2a;}
+

@@ -9,79 +9,12 @@
     <meta name="keywords" content="" />
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"
         integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <style>
-        body {
-            text-align: center;
-        }
-
-        textarea {
-            height: 100px;
-            width: 600px;
-        }
-
-        table {
-            /* width: 100%; */
-            margin: 0 auto;
-            font-family: verdana, arial, sans-serif;
-            font-size: 11px;
-            color: #333333;
-            border-width: 1px;
-            border-color: #666666;
-            border-collapse: collapse;
-        }
-
-        table th {
-            text-align: center;
-            color: #FFF;
-            border-width: 1px;
-            padding: 5px;
-            border-style: solid;
-            border-color: #666666;
-            background-color: #37393a;
-            vertical-align: middle;
-            /*background-color: #dedede;*/
-        }
-
-        table td {
-            text-align: center;
-            border-width: 1px;
-            padding: 2px 5px;
-            border-style: solid;
-            border-color: #666666;
-            text-align: center;
-            /*background-color: #ffffff;*/
-        }
-
-        #limitYear {
-            width: 40px;
-            text-align: center;
-        }
-
-        #info b {
-            font-size: 24px;
-            color: red;
-        }
-    </style>
+    <script src="js/common.js"></script>
 </head>
 
 <body>
-    <p><a href="openWeb.html">批量访问</a>|<a href="siteBaidu.html">批量域名site</a>|<a href="dfz.html">域名分组</a>|<a
-            href="get-history.html">域名历史</a></p>
     域名分组：请输入域名（一行一个）:<br>
-    <textarea id="domains">rgjh999.cn
-rgjh222.cn
-rgjh777.cn
-rgjh555.cn
-rgjh444.cn
-rgjh333.cn
-rgjh111.cn
-rgjh666.cn
-rgjh888.cn
-rgjh000.cn
-rgjh119.cn
-rgjh120.cn
-rgjh110.cn
-rgjh163.cn</textarea>
+    <textarea id="domains"></textarea>
     <br>
     <p id="info">同时访问<input id="myDomainOnlineLimte" type="number" step="1" value="3"
             style="width:3em" />个域名，每个域名访问<input id="myTimeCloseDomain" type="number" step="1" value="10"
@@ -101,16 +34,19 @@ rgjh163.cn</textarea>
         var domain_count = 0;
 
         $(document).ready(function () {
+            document.getElementById("myDomainOnlineLimte").value = localStorage.myDomainOnlineLimte || 3;
+            document.getElementById("myTimeCloseDomain").value = localStorage.myTimeCloseDomain || 10;
+            document.getElementById("domains").value = localStorage.domains || "rgjh999.cn\r\nrgjh777.cn";
 
             $("#start").click(function () {
                 t = Date.parse(new Date());
                 var textarea = document.getElementById("domains").value;
-
                 var addwww = document.getElementById("addwww").checked;
-
                 myTimeCloseDomain = document.getElementById("myTimeCloseDomain").value;
                 myDomainOnlineLimte = document.getElementById("myDomainOnlineLimte").value;
-
+                localStorage.domains=textarea;
+                localStorage.myDomainOnlineLimte=myDomainOnlineLimte;
+                localStorage.myTimeCloseDomain=myTimeCloseDomain;
 
                 // var dArr = textarea.split(/[(\r\n)\r\n]+/);
                 domain_array = textarea.split(/[\r\n]+/);
@@ -132,7 +68,7 @@ rgjh163.cn</textarea>
 
                 (function (__countMark__, _addwww_) {
                     let _window_ = window.open("http://" + domain_array[__countMark__]);
-                    let _window_www=null;
+                    let _window_www = null;
 
                     if (_addwww_) {
                         _window_www = window.open("http://www." + domain_array[__countMark__]);
@@ -148,7 +84,7 @@ rgjh163.cn</textarea>
 
                 if (i + 1 == myDomainOnlineLimte) {
                     setTimeout(function () {
-                         openWeb(__countMark);
+                        openWeb(__countMark);
                     }, myTimeCloseDomain * 1000);
                 }
             }
